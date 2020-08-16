@@ -5,14 +5,14 @@
 # specifications (ITU-R M.1371-4).
 #
 # A fully functional GnuRadio installation is required, including the AIS Frame Builder block,
-# namely gr-ais-simulator.
+# namely gr-ais_simulator.
 #
 # Tested on:
 # GnuRadio 3.8.1
 # gr-osmosdr 0.2.0
 # Ubuntu 20.04 focal
 # Python 3.8
-# GNU C++ version 7.3.0; Boost_1.65.1
+# GNU C++ version 9.3.0; Boost 1.71.
 # HackRF One (2018.01.1)
 #
 # Copyright 2013-2014 -- Embyte & Pastus

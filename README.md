@@ -8,7 +8,7 @@ Tested in the following environment:
 - gr-osmosdr 0.2.0
 - Ubuntu 20.04 focal
 - Python 3.8
-- GNU C++ version 7.3.0; Boost_1.65.1
+- GNU C++ version 9.3.0; Boost 1.71.
 - HackRF One (2018.01.1)
 
 ## Building
