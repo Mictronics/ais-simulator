@@ -1,0 +1,15 @@
+/* -*- c++ -*- */
+
+#define AIS_SIMULATOR_API
+
+%include "gnuradio.i"           // the common stuff
+
+//load generated python docstrings
+%include "ais_simulator_swig_doc.i"
+
+%{
+#include "ais_simulator/build_frame.h"
+%}
+
+%include "ais_simulator/build_frame.h"
+GR_SWIG_BLOCK_MAGIC2(ais_simulator, build_frame);

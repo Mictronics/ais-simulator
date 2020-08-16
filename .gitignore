@@ -1,0 +1,4 @@
+gr-ais_simulator/build/**
+.vscode/**
+ais-simulator.code-workspace
+.flake8
