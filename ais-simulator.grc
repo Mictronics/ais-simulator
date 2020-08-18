@@ -68,23 +68,21 @@ blocks:
     coordinate: [392, 4.0]
     rotation: 0
     state: enabled
-- name: ais_simulator_build_frame_1
-  id: ais_simulator_build_frame
+- name: ais_simulator_bitstring_to_frame_0
+  id: ais_simulator_bitstring_to_frame
   parameters:
     affinity: ''
     alias: ''
     comment: ''
-    enable_input: 'True'
     enable_nrzi: 'True'
     len_tag_key: packet_len
     maxoutbuf: '0'
     minoutbuf: '0'
-    sentence: sentence
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [368, 124.0]
+    coordinate: [368, 140.0]
     rotation: 0
     state: true
 - name: blocks_multiply_const_xx_0
@@ -424,9 +422,9 @@ blocks:
     state: true
 
 connections:
-- [ais_simulator_build_frame_1, '0', digital_gmsk_mod_0, '0']
+- [ais_simulator_bitstring_to_frame_0, '0', digital_gmsk_mod_0, '0']
 - [blocks_multiply_const_xx_0, '0', osmosdr_sink_0, '0']
-- [blocks_pdu_to_tagged_stream_0, '0', ais_simulator_build_frame_1, '0']
+- [blocks_pdu_to_tagged_stream_0, '0', ais_simulator_bitstring_to_frame_0, '0']
 - [blocks_socket_pdu_0, pdus, blocks_pdu_to_tagged_stream_0, pdus]
 - [digital_gmsk_mod_0, '0', blocks_multiply_const_xx_0, '0']
 

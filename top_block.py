@@ -57,7 +57,7 @@ class top_block(gr.top_block):
         self.blocks_socket_pdu_0 = blocks.socket_pdu('TCP_SERVER', '', '1337', 1024, False)
         self.blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, 'packet_len')
         self.blocks_multiply_const_xx_0 = blocks.multiply_const_cc(0.9, 1)
-        self.ais_simulator_build_frame_1 = ais_simulator.build_frame(sentence, True, True, 'packet_len')
+        self.ais_simulator_bitstring_to_frame_0 = ais_simulator.bitstring_to_frame(True, 'packet_len')
 
 
 
@@ -65,9 +65,9 @@ class top_block(gr.top_block):
         # Connections
         ##################################################
         self.msg_connect((self.blocks_socket_pdu_0, 'pdus'), (self.blocks_pdu_to_tagged_stream_0, 'pdus'))
-        self.connect((self.ais_simulator_build_frame_1, 0), (self.digital_gmsk_mod_0, 0))
+        self.connect((self.ais_simulator_bitstring_to_frame_0, 0), (self.digital_gmsk_mod_0, 0))
         self.connect((self.blocks_multiply_const_xx_0, 0), (self.osmosdr_sink_0, 0))
-        self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.ais_simulator_build_frame_1, 0))
+        self.connect((self.blocks_pdu_to_tagged_stream_0, 0), (self.ais_simulator_bitstring_to_frame_0, 0))
         self.connect((self.digital_gmsk_mod_0, 0), (self.blocks_multiply_const_xx_0, 0))
 
 
@@ -76,7 +76,6 @@ class top_block(gr.top_block):
 
     def set_sentence(self, sentence):
         self.sentence = sentence
-        self.ais_simulator_build_frame_1.set_sentence(self.sentence)
 
     def get_samp_rate(self):
         return self.samp_rate

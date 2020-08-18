@@ -4,7 +4,7 @@
 # ais-simulator.py implements a software-based AIS transmitter accordingly to
 # specifications (ITU-R M.1371-4).
 #
-# A fully functional GnuRadio installation is required, including the AIS Frame Builder block,
+# A fully functional GnuRadio installation is required, including the AIS Frame Builder blocks,
 # namely gr-ais_simulator.
 #
 # Tested on:
@@ -23,9 +23,18 @@
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
 #
-# Usage example:
-# $ ./AIVDM_Encoder.py --type=1 --mmsi=970010000 --lat=45.6910 --long=9.7235 | xargs -IX ./ais-simulator.py --payload=X
+# 1.Create bit string:
+# $ ./AIVDM_Encoder.py --type=1 --mmsi=970010000 --lat=45.6910 --long=9.7235
 #
+# 2. Start AIS simulator:
+# $ python3 -u ais-simulator.py
+#
+# 3. In a second terminal start netcat:
+# $ nc localhost 1337
+#
+# 4. Copy and paste bit string output from 1. in netcat, press ENTER.
+#
+# Tested against rtl_ais via OTA transmission.
 
 import signal
 import sys
@@ -40,7 +49,7 @@ import osmosdr
 
 class top_block(gr.top_block):
 
-    def __init__(self, p, c, amp, lna, sr, br, ppm):
+    def __init__(self, c, amp, lna, sr, br, ppm):
         gr.top_block.__init__(self, 'AIS Simulator')
 
         # Blocks
@@ -61,7 +70,7 @@ class top_block(gr.top_block):
         blocks_socket_pdu_0 = blocks.socket_pdu('TCP_SERVER', 'localhost', '1337', 1024, False)
         blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, 'packet_len')
         blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.9, ))
-        ais_build_frame = ais_simulator.build_frame(p, True, True, 'packet_len')
+        ais_build_frame = ais_simulator.bitstring_to_frame(True, 'packet_len')
 
         # Connections
         self.msg_connect((blocks_socket_pdu_0, 'pdus'), (blocks_pdu_to_tagged_stream_0, 'pdus'))
@@ -102,9 +111,6 @@ if __name__ == '__main__':
         default=0,
         dest="ppm")
     parser.add_option(
-        "--payload",
-        help="""Specify the message payload to transmit (crafted via AIVDM_Encoder)""")
-    parser.add_option(
         "--channel",
         help="""Set AIS channel: [A: 161.975MHz (87B)] [B: 162.025MHz (88B)]""",
         default="A")
@@ -121,9 +127,6 @@ if __name__ == '__main__':
 
     (options, args) = parser.parse_args()
 
-    if not options.payload:
-        parser.error("Payload not specified: -h for help.")
-
     if not options.channel:
         parser.error("Channel not specified: -h for help.")
 
@@ -134,6 +137,6 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    tb = top_block(p=options.payload, c=channel_ID, amp=options.rf_amp, lna=options.lna, sr=options.sampling_rate, br=options.bit_rate, ppm=options.ppm)
+    tb = top_block(c=channel_ID, amp=options.rf_amp, lna=options.lna, sr=options.sampling_rate, br=options.bit_rate, ppm=options.ppm)
     tb.start()
     tb.wait()
