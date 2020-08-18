@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2020 Michael Wolf aka Mictronics.
+ * Copyright 2020 Michael Wolf, Mictronics.
  * 
  * This file is based on and contains work from 
  * https://github.com/trendmicro/ais
@@ -35,7 +35,6 @@ namespace gr
         class build_frame_impl : public build_frame
         {
         private:
-            bool d_repeat;
             bool d_enable_nrzi;
             bool d_enable_input;
             const char *d_sentence;
