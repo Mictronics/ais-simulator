@@ -18,5 +18,6 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 install(FILES
-    ais_simulator_build_frame.block.yml DESTINATION share/gnuradio/grc/blocks
+    ais_simulator_build_frame.block.yml
+    ais_simulator_bitstring_to_frame.block.yml DESTINATION share/gnuradio/grc/blocks
 )

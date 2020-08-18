@@ -23,5 +23,6 @@
 ########################################################################
 install(FILES
     api.h
-    build_frame.h DESTINATION include/ais_simulator
+    build_frame.h
+    bitstring_to_frame.h DESTINATION include/ais_simulator
 )
