@@ -2,4 +2,4 @@ gr-ais_simulator/build/**
 .vscode/**
 ais-simulator.code-workspace
 .flake8
-.top_block_py
+top_block.py
