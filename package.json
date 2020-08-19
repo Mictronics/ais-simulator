@@ -1,0 +1,20 @@
+{
+  "name": "ais-simulator",
+  "version": "1.0.0",
+  "description": "AIS Simulator",
+  "author": {
+    "name": "Mictronics"
+  },
+  "private": true,
+  "main": "./app/index.html",
+  "keywords": [],
+  "license": "GNU GPL v3",
+  "engines": {
+    "tsc": ">= 3.9.0"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

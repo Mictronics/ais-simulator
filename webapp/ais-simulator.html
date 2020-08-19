@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AIS Simulator</title>
+    <meta name="description" content="AIS Simulator" />
+    <meta name="author" content="Michael Wolf" />
+    <link rel="stylesheet" href="./assets/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <link rel="stylesheet" href="./assets/noty.css" />
+    <link rel="stylesheet" href="./assets/noty.css" />
+    <link rel="stylesheet" href="./assets/bootstrap-v4.css" />
+  </head>
+  <body>
+    <div class="container-sm">
+      <h1>AIS Simulator</h1>
+      <form id="aisParameterForm" class="aisParameterForm" novalidate>
+        <div class="form-group">
+          <label for="aisMmsiInput"
+            >Source MMSI (Maritime Mobile Service Identity)</label
+          >
+          <input
+            type="text"
+            id="aisMmsiInput"
+            class="form-control"
+            aria-describedby="aisMmsiInputHelp"
+            minlength="9"
+            maxlength="9"
+            value="247320162"
+            required
+          />
+          <small id="aisMmsiInputHelp" class="form-text text-muted"
+            >(9 numeric digits) Encoder default = 247320162 (vessel) or
+            970010000 (SART device).
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="aisMessageTypeSelect">Message Type</label>
+          <select id="aisMessageTypeSelect" class="form-control" required>
+            <option value="0">Select</option>
+            <option value="1">Type 1: Position Report Class A</option>
+            <option value="4">Type 4: Base Station Report</option>
+            <option value="9">Type 9: SAR Aircraft Position Report</option>
+            <option value="12"
+              >Type 12: Addressed Safety-Related Message</option
+            >
+            <option value="14"
+              >Type 14: Safety-Related Broadcast Message</option
+            >
+            <option value="18"
+              >Type 18: Standard Class B CS Position Report</option
+            >
+            <option value="19"
+              >Type 19: Extended Class B CS Position Report</option
+            >
+            <option value="20">Type 20: Data Link Management Message</option>
+            <option value="21">Type 21: Aid-to-Navigation Report</option>
+            <option value="22">Type 22: Channel Management</option>
+            <option value="23">Type 23: Group Assignment Command</option>
+            <option value="24">Type 24: Static Data Report</option>
+          </select>
+        </div>
+        <div class="form-group msgType12">
+          <label for="aisDestMmsiInput">Destination MMSI</label>
+          <input
+            type="text"
+            id="aisDestMmsiInput"
+            class="form-control"
+            aria-describedby="aisDestMmsiInputHelp"
+            minlength="9"
+            maxlength="9"
+            value="247320163"
+            required
+          />
+          <small id="aisDestMmsiInputHelp" class="form-text text-muted"
+            >(9 numeric digits) Encoder default = 247320163
+          </small>
+        </div>
+        <div class="form-group msgType12">
+          <label for="aisAddrMSgInput">Message</label>
+          <input
+            type="text"
+            size="156"
+            id="aisAddrMsgInput"
+            class="form-control"
+            aria-describedby="aisAddrMsgInputHelp"
+            minlength="1"
+            maxlength="156"
+            value="Hello world!"
+            required
+          />
+          <small id="aisAddrMsgInputHelp" class="form-text text-muted"
+            >Enter message (1-156 characters)
+          </small>
+        </div>
+        <div class="form-group msgType14">
+          <label for="aisSartMSgInput">SART Message</label>
+          <input
+            type="text"
+            size="161"
+            id="aisSartMsgInput"
+            class="form-control"
+            aria-describedby="aisSartMsgInputHelp"
+            minlength="1"
+            maxlength="161"
+            value="SART ACTIVE"
+            required
+          />
+          <small id="aisSartMsgInputHelp" class="form-text text-muted"
+            >Enter SART message (1-161 characters); Encoder default = 'SART
+            ACTIVE'
+          </small>
+        </div>
+        <div class="form-group msgType1-4-18">
+          <label for="aisLatInput">Position Latitude</label>
+          <input
+            type="number"
+            id="aisLatInput"
+            class="form-control"
+            aria-describedby="aisLatInputHelp"
+            min="-90"
+            max="90"
+            minlength="1"
+            maxlength="15"
+            step="0.00000001"
+            value="48.0"
+            required
+          />
+          <small id="aisLatInputHelp" class="form-text text-muted"
+            >Enter latitude (-90 to 90); Encoder default = 48.0
+          </small>
+        </div>
+        <div class="form-group msgType1-4-18">
+          <label for="aisLonInput">Position Longitude</label>
+          <input
+            type="number"
+            id="aisLonInput"
+            class="form-control"
+            aria-describedby="aisLonInputHelp"
+            min="-180"
+            max="180"
+            minlength="1"
+            maxlength="15"
+            step="0.00000001"
+            value="10.0"
+            required
+          />
+          <small id="aisLonInputHelp" class="form-text text-muted"
+            >Enter longitude (-180 to 180); Encoder default = 10.0
+          </small>
+        </div>
+        <div class="form-group msgType9">
+          <label for="aisAltitudeInput">Altitude</label>
+          <input
+            type="number"
+            id="aisAltitudeInput"
+            class="form-control"
+            aria-describedby="aisAltitudeInputHelp"
+            min="0"
+            max="4095"
+            minlength="1"
+            maxlength="4"
+            step="1"
+            value="1000"
+            required
+          />
+          <small id="aisAltitudeInputHelp" class="form-text text-muted"
+            >Enter SAR aicraft altitude in meter (4094 = 4094m or higher, 4095 =
+            not available); Encoder default = 1000
+          </small>
+        </div>
+        <div class="form-group msgType1-9-18">
+          <label for="aisSpeedInput">Speed</label>
+          <input
+            type="number"
+            id="aisSpeedInput"
+            class="form-control"
+            aria-describedby="aisSpeedInputHelp"
+            min="-1"
+            max="100"
+            minlength="1"
+            maxlength="5"
+            step="0.1"
+            value="0.1"
+            required
+          />
+          <small id="aisSpeedInputHelp" class="form-text text-muted"
+            >Enter speed, in knots (-1 = speed not available); Encoder default =
+            0.1
+          </small>
+        </div>
+        <div class="form-group msgType1-9-18">
+          <label for="aisCourseInput">Course</label>
+          <input
+            type="number"
+            id="aisCourseInput"
+            class="form-control"
+            aria-describedby="aisCourseInputHelp"
+            min="-1"
+            max="359"
+            minlength="1"
+            maxlength="3"
+            step="0.1"
+            value="83.4"
+            required
+          />
+          <small id="aisCourseInputHelp" class="form-text text-muted"
+            >Enter course (0 to 359; -1 = data not available); Encoder default =
+            83.4
+          </small>
+        </div>
+        <div class="form-group msgType1-18">
+          <label for="aisNavStatusSelect">Navigation Status</label>
+          <select id="aisNavStatusSelect" class="form-control" required>
+            <option value="0">Under way using engine</option>
+            <option value="1">At anchor</option>
+            <option value="2">Not under command</option>
+            <option value="3">Restricted manoeuverability</option>
+            <option value="4">Constrained by her draught</option>
+            <option value="5">Moored</option>
+            <option value="6">Aground</option>
+            <option value="7">Engaged in Fishing</option>
+            <option value="8">Under way sailing</option>
+            <option value="14">AIS-SART is active</option>
+            <option value="15" selected>Not defined</option>
+          </select>
+        </div>
+        <div class="form-group msgType20">
+          <label for="aisFatdmaOffsetInput">FATDMA Offset</label>
+          <input
+            type="number"
+            id="aisFatdmaOffsetInput"
+            class="form-control"
+            aria-describedby="aisFatdmaOffsetInputHelp"
+            min="0"
+            max="4095"
+            minlength="1"
+            maxlength="4"
+            step="1"
+            value="0"
+            required
+          />
+          <small id="aisFatdmaOffsetInputHelp" class="form-text text-muted"
+            >Enter FATDMA reserved offset number (0-4095); Encoder default = 0
+          </small>
+        </div>
+        <div class="form-group msgType20">
+          <label for="aisFatdmaSlotsInput">FATDMA Slots</label>
+          <input
+            type="number"
+            id="aisFatdmaSlotsInput"
+            class="form-control"
+            aria-describedby="aisFatdmaSlotsInputHelp"
+            min="0"
+            max="15"
+            minlength="1"
+            maxlength="2"
+            step="1"
+            value="0"
+            required
+          />
+          <small id="aisFatdmaSlotsInputHelp" class="form-text text-muted"
+            >Enter FATDMA number of reserved slots (0-15); Encoder default = 0
+          </small>
+        </div>
+        <div class="form-group msgType20">
+          <label for="aisTimestampInput">FATDMA Timeout</label>
+          <input
+            type="number"
+            id="aisFatdmaTimeoutInput"
+            class="form-control"
+            aria-describedby="aisFatdmaTimeoutInputHelp"
+            min="0"
+            max="7"
+            minlength="1"
+            maxlength="1"
+            step="1"
+            value="0"
+            required
+          />
+          <small id="isFatdmaTimeoutInputHelp" class="form-text text-muted"
+            >Enter FATDMA timeout, in minutes (0-7); Encoder default = 0
+          </small>
+        </div>
+        <div class="form-group msgType20">
+          <label for="aisFatdmaRepeatInput">FATDMA Repeat Increment</label>
+          <input
+            type="number"
+            id="aisFatdmaRepeatInput"
+            class="form-control"
+            aria-describedby="aisFatdmaRepeatInputHelp"
+            min="0"
+            max="2047"
+            minlength="1"
+            maxlength="4"
+            step="1"
+            value="0"
+            required
+          />
+          <small id="aisFatdmaRepeatInputHelp" class="form-text text-muted"
+            >Enter FATDMA repeat increment (0-2047); Encoder default = 0
+          </small>
+        </div>
+        <div class="form-group msgType21">
+          <div class="custom-control custom-radio custom-control-inline">
+            <input
+              type="radio"
+              id="aisRealAtoNRadio"
+              name="aisAtoNRadio"
+              class="custom-control-input"
+              checked
+            />
+            <label class="custom-control-label" for="aisRealAtoNRadio"
+              >Real</label
+            >
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input
+              type="radio"
+              id="aisVirtualAtoNRadio"
+              name="aisAtoNRadio"
+              class="custom-control-input"
+            />
+            <label class="custom-control-label" for="aisVirtualAtoNRadio"
+              >Virtual</label
+            >
+          </div>
+          <small id="aisAtoNRadioHelp" class="form-text text-muted"
+            >Select if this is a real Aid-to-Navigation at indicated position or
+            if this is a virtual Aid-to-Navigation simulated by nearby AIS
+            station; Encoder default = real
+          </small>
+        </div>
+        <div class="form-group msgType21">
+          <label for="aisAtoNTypeSelect">Type of Navigational Aid</label>
+          <select
+            id="aisAtoNTypeSelect"
+            class="form-control"
+            aria-describedby="aisAtoNTypeHelp"
+            required
+          >
+            <option value="0">Not specified</option>
+            <option value="1" selected>Reference point</option>
+            <option value="2"
+              >RACON (radar transponder marking a navigation hazard)</option
+            >
+            <option value="3"
+              >Fixed structure off shore, such as oil platforms, wind farms,
+              rigs.</option
+            >
+            <option value="4">Spare, Reserved for future use</option>
+            <option value="5">Light, without sectors</option>
+            <option value="6">Light, with sectors</option>
+            <option value="7">Leading Light Front</option>
+            <option value="8">Leading Light Rear</option>
+            <option value="9">Beacon, Cardinal N</option>
+            <option value="10">Beacon, Cardinal E</option>
+            <option value="11">Beacon, Cardinal S</option>
+            <option value="12">Beacon, Cardinal W</option>
+            <option value="13">Beacon, Port hand</option>
+            <option value="14">Beacon, Starboard hand</option>
+            <option value="15">Beacon, Preferred Channel port hand</option>
+            <option value="16">Beacon, Preferred Channel starboard hand</option>
+            <option value="17">Beacon, Isolated danger</option>
+            <option value="18">Beacon, Safe water</option>
+            <option value="19">Beacon, Special mark</option>
+            <option value="20">Cardinal Mark N</option>
+            <option value="21">Cardinal Mark E</option>
+            <option value="22">Cardinal Mark S</option>
+            <option value="23">Cardinal Mark W</option>
+            <option value="24">Port hand Mark</option>
+            <option value="25">Starboard hand Mark</option>
+            <option value="26">Preferred Channel Port hand</option>
+            <option value="27">Preferred Channel Starboard hand</option>
+            <option value="28">Isolated danger</option>
+            <option value="29">Safe Water</option>
+            <option value="30">Special Mark</option>
+            <option value="31">Light Vessel/LANBY/Rigs</option>
+          </select>
+          <small id="aisAtoNTypeHelp" class="form-text text-muted"
+            >Select type of navigational aid; Encoder default = Reference point
+          </small>
+        </div>
+        <div class="form-group msgType21">
+          <label for="aisAtoNNameInput">Aid-to-Navigation name</label>
+          <input
+            type="text"
+            id="aisAtoNNameInput"
+            class="form-control"
+            aria-describedby="aisAtoNNameInputHelp"
+            minlength="1"
+            maxlength="20"
+            value="@@@@@@@@@@@@@@@@@@@@"
+            required
+          />
+          <small id="aisAtoNNameInputHelp" class="form-text text-muted"
+            >Enter Aid-to-Navigation name (1-20 characters); Encoder default =
+            @@@@@@@@@@@@@@@@@@@@
+          </small>
+        </div>
+        <div class="form-group msgType22">
+          <label for="aisChannelAInput">AIS Channel A</label>
+          <input
+            type="number"
+            id="aisChannelAInput"
+            class="form-control"
+            aria-describedby="aisChannelAInputHelp"
+            minlength="4"
+            maxlength="4"
+            step="1"
+            value="2087"
+            required
+          />
+          <small id="aisChannelAInputHelp" class="form-text text-muted"
+            >Enter AIS Channel A channel number, from ITU-R Rec. M.1084<br />Encoder
+            default = 2087 (87B = 161.975 MHz)
+          </small>
+        </div>
+        <div class="form-group msgType22">
+          <label for="aisChannelBInput">AIS Channel B</label>
+          <input
+            type="number"
+            id="aisChannelBInput"
+            class="form-control"
+            aria-describedby="aisChannelBInputHelp"
+            minlength="4"
+            maxlength="4"
+            step="1"
+            value="2088"
+            required
+          />
+          <small id="aisChannelBInputHelp" class="form-text text-muted"
+            >Enter AIS Channel B channel number, from ITU-R Rec. M.1084;<br />Encoder
+            default = 2088 (88B = 162.025 MHz)
+          </small>
+        </div>
+        <div class="form-group msgType22-23">
+          <label for="aisNELatInput">North East Latitude</label>
+          <input
+            type="number"
+            id="aisNELatInput"
+            class="form-control"
+            aria-describedby="aisNELatInputHelp"
+            min="-90"
+            max="90"
+            minlength="1"
+            maxlength="15"
+            step="0.00000001"
+            value="47.5"
+            required
+          />
+          <small id="aisNELatInputHelp" class="form-text text-muted"
+            >Enter northeast corner's latitude of AIS rectangular jurisdiction
+            (-90 to 90)<br />Encoder default = 47.5
+          </small>
+        </div>
+        <div class="form-group msgType22-23">
+          <label for="aisNELonInput">North East Longitude</label>
+          <input
+            type="number"
+            id="aisNELonInput"
+            class="form-control"
+            aria-describedby="aisNELonInputHelp"
+            min="-180"
+            max="180"
+            minlength="1"
+            maxlength="15"
+            step="0.00000001"
+            value="9.5"
+            required
+          />
+          <small id="aisNELonInputHelp" class="form-text text-muted"
+            >Enter northeast corner's longitude (-180 to 180); Encoder default =
+            9.5
+          </small>
+        </div>
+        <div class="form-group msgType22-23">
+          <label for="aisSWLatInput">South West Latitude</label>
+          <input
+            type="number"
+            id="aisSWLatInput"
+            class="form-control"
+            aria-describedby="aisSWLatInputHelp"
+            min="-90"
+            max="90"
+            minlength="1"
+            maxlength="15"
+            step="0.00000001"
+            value="48.5"
+            required
+          />
+          <small id="aisSWLatInputHelp" class="form-text text-muted"
+            >Enter southwest corner's latitude of AIS rectangular jurisdiction
+            (-90 to 90)<br />Encoder default = 48.5
+          </small>
+        </div>
+        <div class="form-group msgType22-23">
+          <label for="aisSWLonInput">South West Longitude</label>
+          <input
+            type="number"
+            id="aisSWLonInput"
+            class="form-control"
+            aria-describedby="aisSWLonInputHelp"
+            min="-180"
+            max="180"
+            minlength="1"
+            maxlength="15"
+            step="0.00000001"
+            value="10.5"
+            required
+          />
+          <small id="aisSWLonInputHelp" class="form-text text-muted"
+            >Enter southwest corner's longitude (-180 to 180); Encoder default =
+            10.5
+          </small>
+        </div>
+        <div class="form-group msgType23">
+          <label for="aisReportingIntervalSelect">Reporting Interval</label>
+          <select id="aisReportingIntervalSelect" class="form-control" required>
+            <option value="0">As given by the autonomous mode</option>
+            <option value="1" selected>10 Minutes</option>
+            <option value="2">6 Minutes</option>
+            <option value="3">3 Minutes</option>
+            <option value="4">1 Minute</option>
+            <option value="5">30 seconds</option>
+            <option value="6">15 seconds</option>
+            <option value="7">10 seconds</option>
+            <option value="8">5 seconds</option>
+            <option value="9">Next shorter reporting interval</option>
+            <option value="10">Next longer reporting interval</option>
+          </select>
+        </div>
+        <div class="form-group msgType23">
+          <label for="aisQuietTimeInput">Station Quiet Time</label>
+          <input
+            type="number"
+            id="aisQuietTimeInput"
+            class="form-control"
+            aria-describedby="aisQuietTimeInputHelp"
+            min="1"
+            max="15"
+            minlength="1"
+            maxlength="15"
+            step="1"
+            value="15"
+            required
+          />
+          <small id="aisQuietTimeInputHelp" class="form-text text-muted"
+            >Enter station quiet time, in minutes (1-15; 0 = none); Encoder
+            default = 15</small
+          >
+        </div>
+        <div class="form-group msgType24">
+          <div class="custom-control custom-radio custom-control-inline">
+            <input
+              type="radio"
+              id="aisStaticReportTypeARadio"
+              name="aisStaticReportTypeRadio"
+              class="custom-control-input"
+            />
+            <label class="custom-control-label" for="aisStaticReportTypeARadio"
+              >Vessel Name</label
+            >
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input
+              type="radio"
+              id="aisStaticReportTypeBRadio"
+              name="aisStaticReportTypeRadio"
+              class="custom-control-input"
+            />
+            <label class="custom-control-label" for="aisStaticReportTypeBRadio"
+              >Vessel Callsign</label
+            >
+          </div>
+          <small id="aisStaticReportTypeRadioHelp" class="form-text text-muted"
+            >Select Static Data Report type (Name or Callsign); Encoder default
+            = Name
+          </small>
+        </div>
+        <div class="form-group msgType24A">
+          <label for="aisVesselNameInput">Vessel Name</label>
+          <input
+            type="text"
+            id="aisVesselNameInput"
+            class="form-control"
+            aria-describedby="aisVesselNameInputHelp"
+            minlength="1"
+            maxlength="20"
+            value="Unknown"
+            required
+          />
+          <small id="aisVesselNameInputHelp" class="form-text text-muted"
+            >Enter vessel name (1-20 characters); Encoder default = Unknown
+          </small>
+        </div>
+        <div class="form-group msgType24B">
+          <label for="aisVesselCallsignInput">Vessel Callsign</label>
+          <input
+            type="text"
+            id="aisVesselCallsignInput"
+            class="form-control"
+            aria-describedby="aisVesselCallsignInputHelp"
+            minlength="1"
+            maxlength="7"
+            value="KC9CAF"
+            required
+          />
+          <small id="aisVesselCallsignInputHelp" class="form-text text-muted"
+            >Enter vessel call sign (1-7 characters); Encoder default = KC9CAF
+          </small>
+        </div>
+        <div class="form-group msgType19-24B">
+          <label for="aisVesselTypeSelect">Vessel Type</label>
+          <select id="aisVesselTypeSelect" class="form-control" required>
+            <option value="0">Not available</option>
+            <option value="20">Wing in ground (WIG)</option>
+            <option value="30">Fishing</option>
+            <option value="31">Towing</option>
+            <option value="32"
+              >Towing: length exceeds 200m or breadth exceeds 25m</option
+            >
+            <option value="33">Dredging or underwater ops</option>
+            <option value="34">Diving ops</option>
+            <option value="35">Military ops</option>
+            <option value="36">Sailing</option>
+            <option value="37">Pleasure Craft</option>
+            <option value="40">High speed craft (HSC)</option>
+            <option value="50">Pilot vessel</option>
+            <option value="51">Search and Rescue vessel</option>
+            <option value="52">Tug</option>
+            <option value="53">Port tender</option>
+            <option value="54">Anti-pollution equipment</option>
+            <option value="55">Law Enforcement</option>
+            <option value="58">Medical Transport</option>
+            <option value="59">Noncombatant ship</option>
+            <option value="60" selected>Passenger ship</option>
+            <option value="70">Cargo</option>
+            <option value="80">Tanker</option>
+            <option value="90">Other type</option>
+            <option value="1">1-19 Reserved</option>
+            <option value="38">38-39 Reserved</option>
+            <option value="56">56-57 Spare</option>
+          </select>
+        </div>
+        <div class="form-group msgType21-24B">
+          <label for="aisVesselLengthInput">Vessel Length</label>
+          <input
+            type="number"
+            id="aisVesselLengthInput"
+            class="form-control"
+            aria-describedby="aisVesselLengthInputHelp"
+            min="0"
+            max="1022"
+            minlength="1"
+            maxlength="4"
+            step="1"
+            value="90"
+            required
+          />
+          <small id="aisVesselLengthInputHelp" class="form-text text-muted"
+            >Enter vessel length, in meters (even number, 0-1022); Encoder
+            default = 90</small
+          >
+        </div>
+        <div class="form-group msgType21-24B">
+          <label for="aisVesselBeamInput">Vessel Beam</label>
+          <input
+            type="number"
+            id="aisVesselBeamInput"
+            class="form-control"
+            aria-describedby="aisVesselBeamInputHelp"
+            min="1"
+            max="126"
+            minlength="1"
+            maxlength="3"
+            step="1"
+            value="14"
+            required
+          />
+          <small id="aisVesselBeamInputHelp" class="form-text text-muted"
+            >Enter vessel beam, in meters (even number, 0-126); Encoder default
+            = 14</small
+          >
+        </div>
+        <button
+          id="aisParameterSubmitButton"
+          type="submit"
+          class="btn btn-success"
+        >
+          Send
+        </button>
+        <button id="aisFormResetButton" type="reset" class="btn btn-danger">
+          Reset
+        </button>
+        <div id="alertBox" class="alert mt-3" role="alert"></div>
+      </form>
+    </div>
+    <script type="text/javascript" src="./assets/noty.min.js"></script>
+    <script type="text/javascript" src="./assets/aivdm_encoder.js"></script>
+    <script type="text/javascript" src="./assets/ais-simulator.js"></script>
+  </body>
+</html>

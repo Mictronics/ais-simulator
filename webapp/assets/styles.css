@@ -1,0 +1,141 @@
+/* Show or hide form field depending on selected message type */
+.msgType1-4-18 {
+  display: var(--msg1-4-18);
+}
+.msgType9 {
+  display: var(--msg9);
+}
+.msgType12 {
+  display: var(--msg12);
+}
+.msgType14 {
+  display: var(--msg14);
+}
+.msgType1-18 {
+  display: var(--msg1-18);
+}
+.msgType1-9-18 {
+  display: var(--msg1-9-18);
+}
+.msgType20 {
+  display: var(--msg20);
+}
+.msgType21 {
+  display: var(--msg21);
+}
+.msgType22 {
+  display: var(--msg22);
+}
+.msgType23 {
+  display: var(--msg23);
+}
+.msgType24 {
+  display: var(--msg24);
+}
+.msgType24A {
+  display: var(--msg24A);
+}
+.msgType24B {
+  display: var(--msg24B);
+}
+.msgType22-23 {
+  display: var(--msg22-23);
+}
+.msgType19-24B {
+  display: var(--msg19-24B);
+}
+.msgType21-24B {
+  display: var(--msg21-24B);
+}
+/* All form fields hidden by default. */
+:root {
+  --msg1-4-18: none;
+  --msg12: none;
+  --msg14: none;
+  --msg9: none;
+  --msg1-18: none;
+  --msg1-9-18: none;
+  --msg20: none;
+  --msg21: none;
+  --msg22: none;
+  --msg23: none;
+  --msg24: none;
+  --msg24A: none;
+  --msg24B: none;
+  --msg22-23: none;
+  --msg19-24B: none;
+  --msg21-24B: none;
+}
+/* Show form fields for message type 1, 4 and 18. */
+[data-msg='msgType1'] {
+  --msg1-4-18: block;
+  --msg1-18: block;
+  --msg1-9-18: block;
+}
+/* Show form fields for message type 4. */
+[data-msg='msgType4'] {
+  --msg1-4-18: block;
+}
+/* Show form fields for message type 9. */
+[data-msg='msgType9'] {
+  --msg1-4-18: block;
+  --msg9: block;
+  --msg1-9-18: block;
+}
+/* Show form fields for message type 12. */
+[data-msg='msgType12'] {
+  --msg12: block;
+}
+/* Show form fields for message type 14. */
+[data-msg='msgType14'] {
+  --msg14: block;
+}
+/* Show form fields for message type 18. */
+[data-msg='msgType18'] {
+  --msg1-4-18: block;
+  --msg1-18: block;
+  --msg1-9-18: block;
+}
+/* Show form fields for message type 19. */
+[data-msg='msgType19'] {
+  --msg1-4-18: block;
+  --msg1-9-18: block;
+  --msg21-24B: block;
+  --msg24A: block;
+  --msg19-24B: block;
+}
+/* Show form fields for message type 20. */
+[data-msg='msgType20'] {
+  --msg20: block;
+}
+/* Show form fields for message type 21. */
+[data-msg='msgType21'] {
+  --msg21: block;
+  --msg21-24B: block;
+}
+/* Show form fields for message type 22. */
+[data-msg='msgType22'] {
+  --msg22: block;
+  --msg22-23: block;
+}
+/* Show form fields for message type 23. */
+[data-msg='msgType23'] {
+  --msg23: block;
+  --msg22-23: block;
+}
+/* Show form fields for message type 24. */
+[data-msg='msgType24'] {
+  --msg24: block;
+}
+/* Show additional form fields for message type 24, sub-type A. */
+[data-msg='msgType24A'] {
+  --msg24: block;
+  --msg24A: block;
+}
+/* Show additional form fields for message type 24, sub-type B. */
+[data-msg='msgType24B'] {
+  --msg24: block;
+  --msg24B: block;
+  --msg19-24B: block;
+  --msg21-24B: block;
+}

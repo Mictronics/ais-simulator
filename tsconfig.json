@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "locale": "us",
+    "module": "ES6",
+    "alwaysStrict": true,
+    "watch": true,
+    "outDir": "./webapp/assets/"
+  },
+  "compileOnSave": true,
+  "files": [
+    "./webapp/ais-simulator.ts",
+    "./webapp/aivdm_encoder.ts",
+    "./webapp/noty.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}
