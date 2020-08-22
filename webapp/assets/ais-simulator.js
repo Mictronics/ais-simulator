@@ -5,7 +5,7 @@ var aisSimulator;
         let msgType24 = aisSimulator.eMessageType24.Unknown;
         let navAidSimType = aisSimulator.eAtoN.Real;
         let selectedMsgType = 0;
-        const ws = new WebSocket("ws://localhost:1337/ws");
+        const ws = new WebSocket("ws://localhost:52002/ws");
         ws.onmessage = (evt) => {
             console.info(evt.data);
         };
@@ -365,7 +365,7 @@ var aisSimulator;
             }
             aisParameters.beam = num;
             if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ id: "msg", data: aisSimulator.AivdmEncoder.encodeMsg(aisParameters) }));
+                ws.send(aisSimulator.AivdmEncoder.encodeMsg(aisParameters));
                 new Noty({
                     layout: "centerRight",
                     progressBar: false,

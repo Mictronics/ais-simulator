@@ -45,7 +45,7 @@ namespace aisSimulator {
         let navAidSimType: eAtoN = eAtoN.Real;
         let selectedMsgType: number = 0;
 
-        const ws = new WebSocket("ws://localhost:1337/ws");
+        const ws = new WebSocket("ws://localhost:52002/ws");
         ws.onmessage = (evt: MessageEvent) => {
             console.info(evt.data);
         };
@@ -481,7 +481,7 @@ namespace aisSimulator {
 
             // AivdmEncoder.encoderTest();
             if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ id: "msg", data: AivdmEncoder.encodeMsg(aisParameters) }));
+                ws.send(AivdmEncoder.encodeMsg(aisParameters));
                 new Noty({
                     layout: "centerRight",
                     progressBar: false,

@@ -19,5 +19,6 @@
 # Boston, MA 02110-1301, USA.
 install(FILES
     ais_simulator_build_frame.block.yml
-    ais_simulator_bitstring_to_frame.block.yml DESTINATION share/gnuradio/grc/blocks
+    ais_simulator_bitstring_to_frame.block.yml
+    ais_simulator_websocket_pdu.block.yml DESTINATION share/gnuradio/grc/blocks
 )
