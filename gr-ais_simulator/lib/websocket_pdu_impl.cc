@@ -31,7 +31,9 @@ namespace gr
     namespace ais_simulator
     {
 
-        // Get on the correct executor
+        /*
+         * Get on correct executor.
+         */
         void session::run()
         {
             // We need to be executing within a strand to perform async operations
@@ -44,6 +46,9 @@ namespace gr
                               shared_from_this()));
         }
 
+        /*
+         * Close websocket.
+         */
         void session::close()
         {
             if (d_ws.is_open())
@@ -52,7 +57,9 @@ namespace gr
             }
         }
 
-        // Start the asynchronous operation
+        /*
+         * Start asynchronous operation.
+         */
         void session::on_run()
         {
             // Set suggested timeout settings for the websocket
@@ -72,6 +79,9 @@ namespace gr
                     shared_from_this()));
         }
 
+        /*
+         * Accepted connection handler.
+         */
         void session::on_accept(beast::error_code ec)
         {
             if (ec)
@@ -80,10 +90,13 @@ namespace gr
                 return;
             }
             // Read a message
-            do_read();
+            read();
         }
 
-        void session::do_read()
+        /*
+         * Setup asynchronous read.
+         */
+        void session::read()
         {
             // Read a message into our buffer
             d_ws.async_read(
@@ -93,10 +106,11 @@ namespace gr
                     shared_from_this()));
         }
 
+        /*
+         * Asynchronous read handler.
+         */
         void session::on_read(beast::error_code ec, std::size_t bytes_transferred)
         {
-            boost::ignore_unused(bytes_transferred);
-
             // This indicates that the session was closed
             if (ec == websocket::error::closed)
             {
@@ -108,19 +122,15 @@ namespace gr
                 std::cerr << "read: " << ec.message() << "\n";
                 return;
             }
-
-            std::cout << "msg: " << beast::buffers_to_string(d_buffer.data()) << "\n";
-            // Echo the message
-            /*
-            d_ws.text(d_ws.got_text());
-            d_ws.async_write(
-                d_buffer.data(),
-                beast::bind_front_handler(
-                    &session::on_write,
-                    shared_from_this()));
-            */
+            // Send websocket data via PDU message, clear buffer and read new data.
+            d_wsi->set_string_msg(beast::buffers_to_string(d_buffer.data()), bytes_transferred);
+            d_buffer.consume(d_buffer.size());
+            read();
         }
 
+        /*
+         * Asynchronous write handler.
+         */
         void session::on_write(beast::error_code ec, std::size_t bytes_transferred)
         {
             boost::ignore_unused(bytes_transferred);
@@ -134,10 +144,10 @@ namespace gr
             d_buffer.consume(d_buffer.size());
 
             // Do another read
-            do_read();
+            read();
         }
 
-        listener::listener(net::io_context &ioc, tcp::endpoint endpoint) : d_ioc(ioc), d_acceptor(ioc)
+        listener::listener(net::io_context &ioc, tcp::endpoint endpoint, websocket_pdu_impl *wsi) : d_ioc(ioc), d_acceptor(ioc), d_wsi{wsi}
         {
             beast::error_code ec;
 
@@ -174,13 +184,18 @@ namespace gr
             }
         }
 
-        // Start accepting incoming connections
+        /*
+         * Start accepting incoming connections.
+         */
         void listener::run()
         {
-            do_accept();
+            accept();
         }
 
-        void listener::do_accept()
+        /*
+         * Setup asynchronous accept handler.
+         */
+        void listener::accept()
         {
             // The new connection gets its own strand
             d_acceptor.async_accept(
@@ -190,9 +205,12 @@ namespace gr
                     shared_from_this()));
         }
 
+        /*
+         * Asynchronous accept handler.
+         */
         void listener::on_accept(beast::error_code ec, tcp::socket socket)
         {
-            // Close an already existing session
+            // Close an already existing session.
             // We accept only one client connection.
             if (d_session != nullptr)
             {
@@ -206,12 +224,12 @@ namespace gr
             else
             {
                 // Create the session and run it
-                d_session = std::make_shared<session>(std::move(socket));
+                d_session = std::make_shared<session>(std::move(socket), d_wsi);
                 d_session->run();
             }
 
             // Accept new connection
-            do_accept();
+            accept();
         }
 
         websocket_pdu::sptr
@@ -233,7 +251,7 @@ namespace gr
             message_port_register_out(d_out_port);
             set_msg_handler(pmt::mp("in"), [this](pmt::pmt_t msg) { this->set_msg(msg); });
 
-            auto const port_ = static_cast<unsigned short>(std::atoi(port.c_str()));
+            const unsigned short port_ = static_cast<unsigned short>(std::atoi(port.c_str()));
             tcp::endpoint tcp_ep;
             if (addr.empty() || addr == "0.0.0.0")
             { // Bind on all interfaces
@@ -251,18 +269,8 @@ namespace gr
                 tcp_ep = *resolver.resolve(query);
             }
 
-            beast::error_code ec;
-            net::ip::address addr_ = net::ip::make_address(addr, ec);
-            // Try to make address to bind on.
-            // Bind on all in case of error.
-            if (ec)
-            {
-                std::cerr << "addr: " << ec.message() << "\n";
-                addr_ = net::ip::make_address("0.0.0.0", ec);
-            }
-
             // Create and launch a listening port
-            std::make_shared<listener>(d_ioc, tcp_ep)->run();
+            std::make_shared<listener>(d_ioc, tcp_ep, this)->run();
             // Run the I/O service on thread
             d_thread = gr::thread::thread(boost::bind(&websocket_pdu_impl::ioc_run, this));
             d_started = true;
@@ -275,6 +283,9 @@ namespace gr
         {
         }
 
+        /*
+         * Stop websocket server thread when block stops.
+         */
         bool websocket_pdu_impl::stop()
         {
             if (d_started)
@@ -285,6 +296,27 @@ namespace gr
             }
             d_started = false;
             return true;
+        }
+
+        /*
+         * Set internal message from PDU IN port and send.
+         */
+        void websocket_pdu_impl::set_msg(pmt::pmt_t msg)
+        {
+            d_msg = msg;
+            message_port_pub(d_out_port, msg);
+        }
+
+        /*
+         * Create and send PDU message from websocket string.
+         */
+        void websocket_pdu_impl::set_string_msg(std::string s, std::size_t l)
+        {
+            d_msg_buffer.resize(l);
+            memcpy(&d_msg_buffer[0], s.c_str(), l);
+            pmt::pmt_t v = pmt::init_u8vector(l, (const uint8_t *)&d_msg_buffer[0]);
+            pmt::pmt_t pdu = pmt::cons(pmt::PMT_NIL, v);
+            message_port_pub(d_out_port, pdu);
         }
 
     } /* namespace ais_simulator */

@@ -44,6 +44,7 @@ namespace gr
         class websocket_pdu_impl : public websocket_pdu
         {
         private:
+            std::vector<uint8_t> d_msg_buffer;
             pmt::pmt_t d_msg;
             const pmt::pmt_t d_out_port;
             gr::thread::thread d_thread;
@@ -55,8 +56,9 @@ namespace gr
         public:
             websocket_pdu_impl(std::string addr, std::string port);
             ~websocket_pdu_impl();
-            void set_msg(pmt::pmt_t msg) { d_msg = msg; }
+            void set_msg(pmt::pmt_t msg);
             pmt::pmt_t msg() const { return d_msg; }
+            void set_string_msg(std::string s, std::size_t l);
             bool stop();
         };
 
@@ -65,16 +67,17 @@ namespace gr
         private:
             websocket::stream<beast::tcp_stream> d_ws;
             beast::flat_buffer d_buffer;
+            websocket_pdu_impl *d_wsi;
 
         public:
-            explicit session(tcp::socket &&socket) : d_ws(std::move(socket)) {}
+            explicit session(tcp::socket &&socket, websocket_pdu_impl *wsi) : d_ws(std::move(socket)), d_wsi{wsi} {}
             void run();
             void close();
             void on_run();
             void on_accept(beast::error_code ec);
-            void do_read();
+            void read();
             void on_read(beast::error_code ec, std::size_t bytes_transferred);
-            void on_write(beast::error_code ec, std::size_t bytes_transfered);
+            void on_write(beast::error_code ec, std::size_t bytes_transferred);
         };
 
         class listener : public std::enable_shared_from_this<listener>
@@ -82,12 +85,13 @@ namespace gr
         private:
             net::io_context &d_ioc;
             tcp::acceptor d_acceptor;
+            websocket_pdu_impl *d_wsi;
             std::shared_ptr<gr::ais_simulator::session> d_session = nullptr;
-            void do_accept();
+            void accept();
             void on_accept(beast::error_code ec, tcp::socket socket);
 
         public:
-            listener(net::io_context &ioc, tcp::endpoint endpoint);
+            listener(net::io_context &ioc, tcp::endpoint endpoint, websocket_pdu_impl *wsi);
             void run();
         };
 
