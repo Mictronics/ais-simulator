@@ -9,7 +9,7 @@ The web application let you select and compose various AIS message and performs 
 
 Tested in the following environment:
 
-- GnuRadio 3.8.1
+- GnuRadio 3.8.2
 - gr-osmosdr 0.2.0
 - Ubuntu 20.04 focal
 - Python 3.8
@@ -43,6 +43,8 @@ sudo apt-get install -y \
 ### Build & Installation
 
 See [README](gr-ais_simulator/README.md) on how to build and install the custom GnuRadio block.
+
+Note: gr-ais_simulator blocks need to rebuild and installed after GnuRadio toolchain update.
 
 ## How to run
 
