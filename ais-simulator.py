@@ -41,11 +41,12 @@ from gnuradio.eng_option import eng_option
 from optparse import OptionParser
 import ais_simulator
 import osmosdr
+import ipaddress
 
 
 class top_block(gr.top_block):
 
-    def __init__(self, c, amp, lna, sr, br, ppm):
+    def __init__(self, c, amp, lna, sr, br, ppm, ip, port):
         gr.top_block.__init__(self, 'AIS Simulator')
 
         # Blocks
@@ -63,7 +64,7 @@ class top_block(gr.top_block):
             verbose=False,
             log=False,
         )
-        websocket_pdu_0 = ais_simulator.websocket_pdu('127.0.0.1', '52002')
+        websocket_pdu_0 = ais_simulator.websocket_pdu(ip, str(port))
         blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, 'packet_len')
         blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.9, ))
         ais_build_frame = ais_simulator.bitstring_to_frame(True, 'packet_len')
@@ -120,6 +121,18 @@ if __name__ == '__main__':
         help="""Set bit rate (default is 9600 Baud)""",
         type="int",
         default=9600)
+    parser.add_option(
+        "--port",
+        help="""Websocket server listen port (default 52002)""",
+        type="int",
+        default=52002
+    )
+    parser.add_option(
+        "--addr",
+        help="""Websocket server listen address (default 0.0.0.0)""",
+        type="string",
+        default="0.0.0.0"
+    )
 
     (options, args) = parser.parse_args()
 
@@ -129,10 +142,26 @@ if __name__ == '__main__':
     if options.channel != "A" and options.channel != "B":
         parser.error("Channel accepts value A or B: -h for help")
 
+    if options.port < 1 or options.port > 65535:
+        parser.error("Invalid value: Websocket listen port!")
+
+    try:
+        ipaddress.ip_address(options.addr)
+    except ValueError:
+        parser.error("Invalid IP address!")
+
     channel_ID = 0 if options.channel == "A" else 1
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    tb = top_block(c=channel_ID, amp=options.rf_amp, lna=options.lna, sr=options.sampling_rate, br=options.bit_rate, ppm=options.ppm)
+    tb = top_block(
+        c=channel_ID,
+        amp=options.rf_amp,
+        lna=options.lna,
+        sr=options.sampling_rate,
+        br=options.bit_rate,
+        ppm=options.ppm,
+        ip=options.addr,
+        port=options.port)
     tb.start()
     tb.wait()
