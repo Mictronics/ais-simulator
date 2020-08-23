@@ -23,16 +23,12 @@
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
 #
-# 1.Create bit string:
-# $ ./AIVDM_Encoder.py --type=1 --mmsi=970010000 --lat=45.6910 --long=9.7235
-#
-# 2. Start AIS simulator:
+# 1. Start AIS simulator:
 # $ python3 -u ais-simulator.py
 #
-# 3. In a second terminal start netcat:
-# $ nc localhost 1337
+# 2. Open ./webapp/ais-simulator.html in browser.
 #
-# 4. Copy and paste bit string output from 1. in netcat, press ENTER.
+# 3. Select AIS message type and send...
 #
 # Tested against rtl_ais via OTA transmission.
 
@@ -67,13 +63,13 @@ class top_block(gr.top_block):
             verbose=False,
             log=False,
         )
-        blocks_socket_pdu_0 = blocks.socket_pdu('TCP_SERVER', 'localhost', '1337', 1024, False)
+        websocket_pdu_0 = ais_simulator.websocket_pdu('127.0.0.1', '52002')
         blocks_pdu_to_tagged_stream_0 = blocks.pdu_to_tagged_stream(blocks.byte_t, 'packet_len')
         blocks_multiply_const_vxx_0 = blocks.multiply_const_vcc((0.9, ))
         ais_build_frame = ais_simulator.bitstring_to_frame(True, 'packet_len')
 
         # Connections
-        self.msg_connect((blocks_socket_pdu_0, 'pdus'), (blocks_pdu_to_tagged_stream_0, 'pdus'))
+        self.msg_connect((websocket_pdu_0, 'out'), (blocks_pdu_to_tagged_stream_0, 'pdus'))
         self.connect((blocks_pdu_to_tagged_stream_0, 0), (ais_build_frame, 0))
         self.connect((ais_build_frame, 0), (digital_gmsk_mod_0, 0))
         self.connect((digital_gmsk_mod_0, 0), (blocks_multiply_const_vxx_0, 0))
