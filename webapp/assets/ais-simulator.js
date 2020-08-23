@@ -30,6 +30,16 @@ var aisSimulator;
                 type: "error",
             }).show();
         };
+        ws.onclose = () => {
+            new Noty({
+                layout: "centerRight",
+                progressBar: false,
+                text: "Websocket closed!",
+                theme: "bootstrap-v4",
+                timeout: 5000,
+                type: "warning",
+            }).show();
+        };
         document.getElementById("aisMessageTypeSelect").addEventListener("change", (e) => {
             const sel = e.target;
             switch (sel.value) {

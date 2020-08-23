@@ -73,6 +73,17 @@ namespace aisSimulator {
             }).show();
         };
 
+        ws.onclose = () => {
+            new Noty({
+                layout: "centerRight",
+                progressBar: false,
+                text: "Websocket closed!",
+                theme: "bootstrap-v4",
+                timeout: 5000,
+                type: "warning",
+            }).show();
+        }
+
         /**
          * Provide form field depending on selected message type.
          */
