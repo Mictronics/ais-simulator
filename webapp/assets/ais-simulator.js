@@ -18,6 +18,8 @@ var aisSimulator;
                 timeout: 500,
                 type: "success",
             }).show();
+            const btn = document.getElementById("aisParameterSubmitButton");
+            btn.disabled = false;
         };
         ws.onerror = (ev) => {
             console.error("WebSocket error:", ev);
@@ -29,6 +31,8 @@ var aisSimulator;
                 timeout: 3500,
                 type: "error",
             }).show();
+            const btn = document.getElementById("aisParameterSubmitButton");
+            btn.disabled = true;
         };
         ws.onclose = () => {
             new Noty({
@@ -39,6 +43,8 @@ var aisSimulator;
                 timeout: 5000,
                 type: "warning",
             }).show();
+            const btn = document.getElementById("aisParameterSubmitButton");
+            btn.disabled = true;
         };
         document.getElementById("aisMessageTypeSelect").addEventListener("change", (e) => {
             const sel = e.target;

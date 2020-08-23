@@ -74,6 +74,8 @@ namespace aisSimulator {
                 timeout: 500,
                 type: "success",
             }).show();
+            const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
+            btn.disabled = false;
         };
 
         ws.onerror = (ev: Event) => {
@@ -86,6 +88,8 @@ namespace aisSimulator {
                 timeout: 3500,
                 type: "error",
             }).show();
+            const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
+            btn.disabled = true;
         };
 
         ws.onclose = () => {
@@ -97,6 +101,8 @@ namespace aisSimulator {
                 timeout: 5000,
                 type: "warning",
             }).show();
+            const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
+            btn.disabled = true;
         }
 
         /**
@@ -505,7 +511,6 @@ namespace aisSimulator {
             }
             aisParameters.beam = num;
 
-            // AivdmEncoder.encoderTest();
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(AivdmEncoder.encodeMsg(aisParameters));
                 new Noty({
