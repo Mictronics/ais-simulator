@@ -1,9 +1,12 @@
-This directory contains a custom block for GnuRadio that is called AIS Frame Builder.
- 
-This block serves as generator of AIS frames and implements the full AIS stack.
-It is composed of three main components covering respectively the 
-application/presentation layers, the link layer and the physical layer, 
+This directory contains custom blocks for GnuRadio that are called AIS Simulator.
+
+Two blocks serve as generator of AIS frames and implements the full AIS stack.
+It is composed of three main components covering respectively the
+application/presentation layers, the link layer and the physical layer,
 as defined in the protocol specification for AIS.
+
+A websocket server to PDU message converter block accepts AIS bit strings from an external source,
+convert and output a message.
 
 Based on and contains work from:
 
@@ -18,7 +21,7 @@ $ mkdir build
 $ cd build
 $ cmake ../ -Wno-dev -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3.8 -DPYTHON_INCLUDE_DIR:PATH=/usr/include/python3.8 -DPYTHON_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpython3.8.so
 $ make
-$ sudo make install 
+$ sudo make install
 ```
 
 In case of `ImportError: No module named ais_simulator` set LD_LIBRARY_PATH:

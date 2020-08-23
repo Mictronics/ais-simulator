@@ -2,6 +2,11 @@
 
 An AIS simulator based on AIS BlackToolkit from [Trendmicro](https://github.com/trendmicro/ais).
 
+This code provides three GNURadio blocks. Two for AIS frame generation from a given bit string and
+a websocket server to PDU message converter.
+
+The web application let you select and compose various AIS message and performs conversion to the required bit string that is then send via websocket connection to the GNURadio backend.
+
 Tested in the following environment:
 
 - GnuRadio 3.8.1
@@ -41,7 +46,11 @@ See [README](gr-ais_simulator/README.md) on how to build and install the custom 
 
 ## How to run
 
-See short description in each file's header.
+1. Start AIS simulator `$ python3 -u ais-simulator.py`
+2. Open ./webapp/ais-simulator.html in browser.
+3. Select AIS message type, modify parameters and send message...
+
+Tested against [rtl_ais](https://github.com/dgiardini/rtl-ais) via over the air transmission.
 
 #### License
 
