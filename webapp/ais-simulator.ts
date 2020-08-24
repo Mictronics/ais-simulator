@@ -16,44 +16,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace aisSimulator {
-    interface IAisParameterFormElementCollection {
-        aisAtoNNameInput: HTMLInputElement;
-        aisAtoNTypeSelect: HTMLSelectElement;
-        aisChannelAInput: HTMLInputElement;
-        aisChannelBInput: HTMLInputElement;
-        aisCourseInput: HTMLInputElement;
-        aisFatdmaOffsetInput: HTMLInputElement;
-        aisFatdmaRepeatInput: HTMLInputElement;
-        aisFatdmaSlotsInput: HTMLInputElement;
-        aisFatdmaTimeoutInput: HTMLInputElement;
-        aisFormResetButton: HTMLButtonElement;
-        aisLatInput: HTMLInputElement;
-        aisLonInput: HTMLInputElement;
-        aisMmsiInput: HTMLInputElement;
-        aisNELatInput: HTMLInputElement;
-        aisNELonInput: HTMLInputElement;
-        aisParameterSubmitButton: HTMLButtonElement;
-        aisQuietTimeInput: HTMLInputElement;
-        aisRealAtoNRadio: HTMLInputElement;
-        aisReportingIntervalSelect: HTMLSelectElement;
-        aisSWLatInput: HTMLInputElement;
-        aisSWLonInput: HTMLInputElement;
-        aisSartMsgInput: HTMLInputElement;
-        aisSpeedInput: HTMLInputElement;
-        aisStaticReportTypeARadio: HTMLInputElement;
-        aisStaticReportTypeBRadio: HTMLInputElement;
-        aisNavStatusSelect: HTMLSelectElement;
-        aisMessageTypeSelect: HTMLSelectElement;
-        aisVesselBeamInput: HTMLInputElement;
-        aisVesselCallsignInput: HTMLInputElement;
-        aisVesselLengthInput: HTMLInputElement;
-        aisVesselNameInput: HTMLInputElement;
-        aisVesselTypeSelect: HTMLInputElement;
-        aisVirtualAtoNRadio: HTMLInputElement;
-        aisAltitudeInput: HTMLInputElement;
-        aisAddrMsgInput: HTMLInputElement;
-        aisDestMmsiInput: HTMLInputElement;
-    }
 
     (() => {
         let msgType24: eMessageType24 = eMessageType24.Unknown;

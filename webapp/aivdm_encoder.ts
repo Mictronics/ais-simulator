@@ -16,52 +16,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace aisSimulator {
-    export interface IAisParameter {
-        addrMsg: string;
-        altitude: number;
-        beam: number;
-        callsign: string;
-        channelA: number;
-        channelB: number;
-        course: number;
-        destMmsi: number;
-        fatdmaOffset: number;
-        fatdmaRepeat: number;
-        fatdmaSlot: number;
-        fatdmaTimeout: number;
-        interval: number;
-        length: number;
-        srcMmsi: number;
-        msgType: number;
-        msgType24: number;
-        name: string;
-        navAidName: string;
-        navAidSimType: number;
-        navAidType: number;
-        neLat: number;
-        neLon: number;
-        posLat: number;
-        posLon: number;
-        quiet: number;
-        sartMsg: string;
-        speed: number;
-        status: number;
-        swLat: number;
-        swLon: number;
-        type: number;
-    }
-
-    export enum eMessageType24 {
-        Unknown = 0,
-        TypeA = 1,
-        TypeB = 2,
-    }
-
-    export enum eAtoN {
-        Unknown = 0,
-        Real = 1,
-        Virtual = 2,
-    }
 
     export class AivdmEncoder {
 
@@ -237,8 +191,8 @@ namespace aisSimulator {
         /**
          * Create binary message header string.
          * @param msgType Message type
-         * @param mmsi MMSI 
-         * @param repeatCount 
+         * @param mmsi MMSI
+         * @param repeatCount
          */
         private static getMsgHeader(msgType: number, mmsi: number, repeatCount: number): string {
             const bMsgType = msgType.toString(2).padStart(6, "0");

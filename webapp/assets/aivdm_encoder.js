@@ -1,18 +1,6 @@
 "use strict";
 var aisSimulator;
 (function (aisSimulator) {
-    let eMessageType24;
-    (function (eMessageType24) {
-        eMessageType24[eMessageType24["Unknown"] = 0] = "Unknown";
-        eMessageType24[eMessageType24["TypeA"] = 1] = "TypeA";
-        eMessageType24[eMessageType24["TypeB"] = 2] = "TypeB";
-    })(eMessageType24 = aisSimulator.eMessageType24 || (aisSimulator.eMessageType24 = {}));
-    let eAtoN;
-    (function (eAtoN) {
-        eAtoN[eAtoN["Unknown"] = 0] = "Unknown";
-        eAtoN[eAtoN["Real"] = 1] = "Real";
-        eAtoN[eAtoN["Virtual"] = 2] = "Virtual";
-    })(eAtoN = aisSimulator.eAtoN || (aisSimulator.eAtoN = {}));
     class AivdmEncoder {
         static encodeMsg(ap) {
             switch (ap.msgType) {
@@ -61,10 +49,10 @@ var aisSimulator;
                 interval: 1,
                 length: 90,
                 msgType: 1,
-                msgType24: eMessageType24.TypeA,
+                msgType24: aisSimulator.eMessageType24.TypeA,
                 name: "Unknown",
                 navAidName: "@@@@@@@@@@@@@@@@@@@@",
-                navAidSimType: eAtoN.Real,
+                navAidSimType: aisSimulator.eAtoN.Real,
                 navAidType: 1,
                 neLat: 47.5,
                 neLon: 9.5,
@@ -115,13 +103,13 @@ var aisSimulator;
             console.assert(s.length === 168);
             s = this.encodeMsgType23(ap.srcMmsi, ap.neLat, ap.neLon, ap.swLat, ap.swLon, ap.interval, ap.quiet);
             console.assert(s.length === 160);
-            s = this.encodeMsgType24(ap.srcMmsi, eMessageType24.TypeA, "1", "1", ap.length, ap.beam, ap.type);
+            s = this.encodeMsgType24(ap.srcMmsi, aisSimulator.eMessageType24.TypeA, "1", "1", ap.length, ap.beam, ap.type);
             console.assert(s.length === 168);
-            s = this.encodeMsgType24(ap.srcMmsi, eMessageType24.TypeA, "01234567890123456789", "1", ap.length, ap.beam, ap.type);
+            s = this.encodeMsgType24(ap.srcMmsi, aisSimulator.eMessageType24.TypeA, "01234567890123456789", "1", ap.length, ap.beam, ap.type);
             console.assert(s.length === 168);
-            s = this.encodeMsgType24(ap.srcMmsi, eMessageType24.TypeB, "01234567890123456789", "1", ap.length, ap.beam, ap.type);
+            s = this.encodeMsgType24(ap.srcMmsi, aisSimulator.eMessageType24.TypeB, "01234567890123456789", "1", ap.length, ap.beam, ap.type);
             console.assert(s.length === 168);
-            s = this.encodeMsgType24(ap.srcMmsi, eMessageType24.TypeB, "01234567890123456789", "0123456789", ap.length, ap.beam, ap.type);
+            s = this.encodeMsgType24(ap.srcMmsi, aisSimulator.eMessageType24.TypeB, "01234567890123456789", "0123456789", ap.length, ap.beam, ap.type);
             console.assert(s.length === 168);
         }
         static encodeString(s) {
@@ -296,7 +284,7 @@ var aisSimulator;
             let hl = "000000000";
             let hw = "000000";
             let bVirtual = "1";
-            if (navaidSimType === eAtoN.Real) {
+            if (navaidSimType === aisSimulator.eAtoN.Real) {
                 hl = (vLength / 2).toString(2).padStart(9, "0");
                 hw = (vBeam / 2).toString(2).padStart(6, "0");
                 bVirtual = "0";
@@ -333,7 +321,7 @@ var aisSimulator;
             let part = "00";
             let n = vName.substr(0, 20);
             let padding;
-            if (msgType === eMessageType24.TypeA) {
+            if (msgType === aisSimulator.eMessageType24.TypeA) {
                 const bName = this.encodeString(n);
                 padding = "".padStart(120 - bName.length, "0");
                 return header + part + bName + padding + "00000000";
