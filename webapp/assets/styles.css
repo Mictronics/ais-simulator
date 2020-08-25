@@ -99,6 +99,10 @@
   display: var(--draught);
 }
 
+.formInterrogatorMsgType {
+  display: var(--interrogatorMsgType);
+}
+
 /* All form fields hidden by default. */
 :root {
   --destMmsi: none;
@@ -126,8 +130,8 @@
   --destination: none;
   --eta: none;
   --draught: none;
+  --interrogatorMsgType: none;
 }
-
 /* Show form fields for message type 1, 4 and 18. */
 [data-msg='msgType1'] {
   --posLat: block;
@@ -141,7 +145,6 @@
   --posLat: block;
   --posLon: block;
 }
-
 /* Show form fields for message type 5. */
 [data-msg='msgType5'] {
   --name: block;
@@ -153,7 +156,6 @@
   --eta: block;
   --draught: block;
 }
-
 /* Show form fields for message type 9. */
 [data-msg='msgType9'] {
   --posLat: block;
@@ -170,6 +172,11 @@
 /* Show form fields for message type 14. */
 [data-msg='msgType14'] {
   --sartMsg: block;
+}
+/* Show form fields for message type 15. */
+[data-msg='msgType15'] {
+  --interrogatorMsgType: block;
+  --destMmsi: block;
 }
 /* Show form fields for message type 18. */
 [data-msg='msgType18'] {

@@ -52,6 +52,7 @@
             <option value="14"
               >Type 14: Safety-Related Broadcast Message</option
             >
+            <option value="15">Type 15: Interrogation</option>
             <option value="18"
               >Type 18: Standard Class B CS Position Report</option
             >
@@ -732,12 +733,30 @@
             id="aisEtaInput"
             class="form-control"
             aria-describedby="aisEtaInputHelp"
-            pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
             required
           />
           <small id="aisEtaInputHelp" class="form-text text-muted"
             >Enter estimated time of arrival.</small
           >
+        </div>
+        <div class="form-group formInterrogatorMsgType">
+          <label for="aisInterrogatorMsgTypeSelect"
+            >Interrogation Message Type</label
+          >
+          <select
+            id="aisInterrogatorMsgTypeSelect"
+            class="form-control"
+            required
+          >
+            <option value="1" selected>1: Position Report Class A</option>
+            <option value="4">4: Base Station Report</option>
+            <option value="5">5: Static and Voyage Related Data</option>
+            <option value="9">9: Standard SAR Aircraft Position Report</option>
+            <option value="10">10: UTC/Date Inquiry</option>
+            <option value="18">18: Standard Class B CS Position Report</option>
+            <option value="19">19: Extended Class B CS Position Report</option>
+            <option value="24">24: Static Data Report</option>
+          </select>
         </div>
         <button
           id="aisParameterSubmitButton"

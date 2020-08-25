@@ -83,6 +83,9 @@ var aisSimulator;
                 case "14":
                     document.documentElement.setAttribute("data-msg", "msgType14");
                     break;
+                case "15":
+                    document.documentElement.setAttribute("data-msg", "msgType15");
+                    break;
                 case "18":
                     document.documentElement.setAttribute("data-msg", "msgType18");
                     break;
@@ -159,6 +162,7 @@ var aisSimulator;
             navAidSimType = eAtoN.Real;
             document.documentElement.setAttribute("data-msg", "none");
         });
+        document.getElementById("aisEtaInput").value = (new Date(Date.now())).toISOString().slice(0, 16);
         function verifyMmsi(mmsi) {
             if (mmsi.length !== 9) {
                 return false;
@@ -187,6 +191,7 @@ var aisSimulator;
                 fatdmaRepeat: 0,
                 fatdmaSlot: 0,
                 fatdmaTimeout: 0,
+                interrogationMsgType: 1,
                 interval: 1,
                 length: 90,
                 msgType: 1,
@@ -420,7 +425,12 @@ var aisSimulator;
             const d = new Date();
             d.setTime(num);
             aisParameters.eta = d;
-            aisSimulator.AivdmEncoder.encoderTest();
+            num = parseInt(form.aisInterrogatorMsgTypeSelect.value, 10);
+            if (num < 0 || num > 27) {
+                form.aisInterrogatorMsgTypeSelect.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            aisParameters.interrogationMsgType = num;
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(aisSimulator.AivdmEncoder.encodeMsg(aisParameters));
                 new Noty({

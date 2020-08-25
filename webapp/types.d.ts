@@ -57,6 +57,7 @@ declare namespace aisSimulator {
         aisVesselDraughtInput: HTMLInputElement;
         aisVesselDestinationInput: HTMLInputElement;
         aisEtaInput: HTMLInputElement;
+        aisInterrogatorMsgTypeSelect: HTMLSelectElement;
     }
 
     export interface IAisParameter {
@@ -75,6 +76,7 @@ declare namespace aisSimulator {
         fatdmaRepeat: number;
         fatdmaSlot: number;
         fatdmaTimeout: number;
+        interrogationMsgType: number;
         interval: number;
         length: number;
         srcMmsi: number;

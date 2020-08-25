@@ -33,6 +33,8 @@ namespace aisSimulator {
                     return this.encodeMsgType12(ap.srcMmsi, ap.destMmsi, ap.addrMsg);
                 case 14:
                     return this.encodeMsgType14(ap.srcMmsi, ap.sartMsg);
+                case 15:
+                    return this.encodeMsgType15(ap.srcMmsi, ap.destMmsi, ap.interrogationMsgType);
                 case 18:
                     return this.encodeMsgType18(ap.srcMmsi, ap.speed, ap.course, ap.posLat, ap.posLon);
                 case 19:
@@ -73,6 +75,7 @@ namespace aisSimulator {
                 fatdmaRepeat: 0,
                 fatdmaSlot: 0,
                 fatdmaTimeout: 0,
+                interrogationMsgType: 1,
                 interval: 1,
                 length: 90,
                 msgType: 1,
@@ -104,6 +107,9 @@ namespace aisSimulator {
             s = this.encodeMsgType5(ap.srcMmsi, "01234567", "01234567890123456789", ap.type, ap.length, ap.beam, ap.eta, ap.draught, "01234567890123456789");
             console.assert(s.length === 424);
 
+            s = this.encodeMsgType5(ap.srcMmsi, "1", "1", ap.type, ap.length, ap.beam, ap.eta, ap.draught, "1");
+            console.assert(s.length === 424);
+
             s = this.encodeMsgType9(ap.srcMmsi, ap.altitude, ap.speed, ap.course, ap.posLat, ap.posLon);
             console.assert(s.length === 168);
 
@@ -120,6 +126,9 @@ namespace aisSimulator {
             console.assert(s.length === 1006);
             s += "".padStart(8 - (s.length % 8), "0");
             console.assert(s.length === 1008);
+
+            s = this.encodeMsgType15(ap.srcMmsi, 247320152, 1);
+            console.assert(s.length === 88);
 
             s = this.encodeMsgType18(ap.srcMmsi, ap.speed, ap.course, ap.posLat, ap.posLon);
             console.assert(s.length === 168);
@@ -294,9 +303,9 @@ namespace aisSimulator {
             // AIS antenna in the middle
             const hl = (vLength / 2).toString(2).padStart(9, "0");
             const hw = (vBeam / 2).toString(2).padStart(6, "0");
-            const bMonth = eta.getUTCMonth().toString(2).padStart(6, "0");
-            const bDay = eta.getUTCDay().toString(2).padStart(6, "0");
-            const bHour = eta.getUTCHours().toString(2).padStart(6, "0");
+            const bMonth = eta.getUTCMonth().toString(2).padStart(4, "0");
+            const bDay = eta.getUTCDay().toString(2).padStart(5, "0");
+            const bHour = eta.getUTCHours().toString(2).padStart(5, "0");
             const bMin = eta.getUTCMinutes().toString(2).padStart(6, "0");
             const bEta = bMonth + bDay + bHour + bMin;
             const bFix = "0001"; // GPS
@@ -370,6 +379,14 @@ namespace aisSimulator {
             const bSpare = "00"; // Spare bit
             const bMsg = this.encodeString(msg.substr(0, 161));
             return header + bSpare + bMsg;
+        }
+
+        private static encodeMsgType15(sourceMmsi: number, destMmsi: number, msgType: number): string {
+            const header = this.getMsgHeader(15, sourceMmsi, 3);
+            const bDestMmsi = destMmsi.toString(2).padStart(30, "0");
+            const bMsgType = msgType.toString(2).padStart(6, "0");
+
+            return header + "00" + bDestMmsi + bMsgType + "000000000000";
         }
 
         /**

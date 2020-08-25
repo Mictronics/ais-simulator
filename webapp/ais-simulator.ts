@@ -107,6 +107,9 @@ namespace aisSimulator {
                 case "14":
                     document.documentElement.setAttribute("data-msg", "msgType14");
                     break;
+                case "15":
+                    document.documentElement.setAttribute("data-msg", "msgType15");
+                    break;
                 case "18":
                     document.documentElement.setAttribute("data-msg", "msgType18");
                     break;
@@ -213,6 +216,11 @@ namespace aisSimulator {
         });
 
         /**
+         * Preset message 5 ETA field, otherwise form validity check will fail.
+         */
+        (document.getElementById("aisEtaInput") as HTMLInputElement).value = (new Date(Date.now())).toISOString().slice(0, 16);
+
+        /**
          * Verify MMSI for correct length and all numeric.
          * @param mmsi MMSI as string.
          */
@@ -251,6 +259,7 @@ namespace aisSimulator {
                 fatdmaRepeat: 0,
                 fatdmaSlot: 0,
                 fatdmaTimeout: 0,
+                interrogationMsgType: 1,
                 interval: 1,
                 length: 90,
                 msgType: 1,
@@ -515,6 +524,13 @@ namespace aisSimulator {
             const d = new Date();
             d.setTime(num);
             aisParameters.eta = d;
+
+            num = parseInt(form.aisInterrogatorMsgTypeSelect.value, 10);
+            if (num < 0 || num > 27) {
+                form.aisInterrogatorMsgTypeSelect.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            aisParameters.interrogationMsgType = num;
 
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(AivdmEncoder.encodeMsg(aisParameters));
