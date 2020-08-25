@@ -17,6 +17,18 @@
 
 namespace aisSimulator {
 
+    export enum eMessageType24 {
+        Unknown = 0,
+        TypeA = 1,
+        TypeB = 2,
+    }
+
+    export enum eAtoN {
+        Unknown = 0,
+        Real = 1,
+        Virtual = 2,
+    }
+
     (() => {
         let msgType24: eMessageType24 = eMessageType24.Unknown;
         let navAidSimType: eAtoN = eAtoN.Real;
@@ -82,6 +94,9 @@ namespace aisSimulator {
                     break;
                 case "4":
                     document.documentElement.setAttribute("data-msg", "msgType4");
+                    break;
+                case "5":
+                    document.documentElement.setAttribute("data-msg", "msgType5");
                     break;
                 case "9":
                     document.documentElement.setAttribute("data-msg", "msgType9");
@@ -228,7 +243,10 @@ namespace aisSimulator {
                 channelA: 2087,
                 channelB: 2088,
                 course: 83.4,
+                destination: "Unknown",
                 destMmsi: 247320163,
+                draught: 25,
+                eta: new Date(),
                 fatdmaOffset: 0,
                 fatdmaRepeat: 0,
                 fatdmaSlot: 0,
@@ -452,6 +470,12 @@ namespace aisSimulator {
             }
             aisParameters.callsign = form.aisVesselCallsignInput.value;
 
+            if (form.aisVesselDestinationInput.value.length < 1 || form.aisVesselDestinationInput.value.length > 20) {
+                form.aisVesselDestinationInput.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            aisParameters.destination = form.aisVesselDestinationInput.value;
+
             num = parseInt(form.aisVesselTypeSelect.value, 10);
             if (num < 0 || num > 99) {
                 form.aisVesselTypeSelect.classList.replace("is-valid", "is-invalid");
@@ -472,6 +496,25 @@ namespace aisSimulator {
                 return;
             }
             aisParameters.beam = num;
+
+            num = parseFloat(form.aisVesselDraughtInput.value);
+            if (num < 0) {
+                form.aisVesselDraughtInput.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            if (num > 25.5) {
+                num = 25.5;
+            }
+            aisParameters.draught = num * 10;
+
+            num = Date.parse(form.aisEtaInput.value);
+            if (num === Number.NaN) {
+                form.aisEtaInput.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            const d = new Date();
+            d.setTime(num);
+            aisParameters.eta = d;
 
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(AivdmEncoder.encodeMsg(aisParameters));

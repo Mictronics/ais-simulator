@@ -1,9 +1,21 @@
 "use strict";
 var aisSimulator;
 (function (aisSimulator) {
+    let eMessageType24;
+    (function (eMessageType24) {
+        eMessageType24[eMessageType24["Unknown"] = 0] = "Unknown";
+        eMessageType24[eMessageType24["TypeA"] = 1] = "TypeA";
+        eMessageType24[eMessageType24["TypeB"] = 2] = "TypeB";
+    })(eMessageType24 = aisSimulator.eMessageType24 || (aisSimulator.eMessageType24 = {}));
+    let eAtoN;
+    (function (eAtoN) {
+        eAtoN[eAtoN["Unknown"] = 0] = "Unknown";
+        eAtoN[eAtoN["Real"] = 1] = "Real";
+        eAtoN[eAtoN["Virtual"] = 2] = "Virtual";
+    })(eAtoN = aisSimulator.eAtoN || (aisSimulator.eAtoN = {}));
     (() => {
-        let msgType24 = aisSimulator.eMessageType24.Unknown;
-        let navAidSimType = aisSimulator.eAtoN.Real;
+        let msgType24 = eMessageType24.Unknown;
+        let navAidSimType = eAtoN.Real;
         let selectedMsgType = 0;
         const ws = new WebSocket("ws://localhost:52002/ws");
         ws.onmessage = (evt) => {
@@ -59,6 +71,9 @@ var aisSimulator;
                 case "4":
                     document.documentElement.setAttribute("data-msg", "msgType4");
                     break;
+                case "5":
+                    document.documentElement.setAttribute("data-msg", "msgType5");
+                    break;
                 case "9":
                     document.documentElement.setAttribute("data-msg", "msgType9");
                     break;
@@ -98,26 +113,26 @@ var aisSimulator;
             const r = e.target;
             if (r.checked) {
                 document.documentElement.setAttribute("data-msg", "msgType24A");
-                msgType24 = aisSimulator.eMessageType24.TypeA;
+                msgType24 = eMessageType24.TypeA;
             }
         });
         document.getElementById("aisStaticReportTypeBRadio").addEventListener("click", (e) => {
             const r = e.target;
             if (r.checked) {
                 document.documentElement.setAttribute("data-msg", "msgType24B");
-                msgType24 = aisSimulator.eMessageType24.TypeB;
+                msgType24 = eMessageType24.TypeB;
             }
         });
         document.getElementById("aisRealAtoNRadio").addEventListener("click", (e) => {
             const r = e.target;
             if (r.checked) {
-                navAidSimType = aisSimulator.eAtoN.Real;
+                navAidSimType = eAtoN.Real;
             }
         });
         document.getElementById("aisVirtualAtoNRadio").addEventListener("click", (e) => {
             const r = e.target;
             if (r.checked) {
-                navAidSimType = aisSimulator.eAtoN.Virtual;
+                navAidSimType = eAtoN.Virtual;
             }
         });
         document.getElementById("aisParameterForm").addEventListener("submit", (e) => {
@@ -140,8 +155,8 @@ var aisSimulator;
             }
         });
         document.getElementById("aisFormResetButton").addEventListener("click", (e) => {
-            msgType24 = aisSimulator.eMessageType24.Unknown;
-            navAidSimType = aisSimulator.eAtoN.Real;
+            msgType24 = eMessageType24.Unknown;
+            navAidSimType = eAtoN.Real;
             document.documentElement.setAttribute("data-msg", "none");
         });
         function verifyMmsi(mmsi) {
@@ -164,7 +179,10 @@ var aisSimulator;
                 channelA: 2087,
                 channelB: 2088,
                 course: 83.4,
+                destination: "Unknown",
                 destMmsi: 247320163,
+                draught: 25,
+                eta: new Date(),
                 fatdmaOffset: 0,
                 fatdmaRepeat: 0,
                 fatdmaSlot: 0,
@@ -172,10 +190,10 @@ var aisSimulator;
                 interval: 1,
                 length: 90,
                 msgType: 1,
-                msgType24: aisSimulator.eMessageType24.TypeA,
+                msgType24: eMessageType24.TypeA,
                 name: "Unknown",
                 navAidName: "@@@@@@@@@@@@@@@@@@@@",
-                navAidSimType: aisSimulator.eAtoN.Real,
+                navAidSimType: eAtoN.Real,
                 navAidType: 1,
                 neLat: 47.5,
                 neLon: 9.5,
@@ -275,14 +293,14 @@ var aisSimulator;
                 return;
             }
             aisParameters.fatdmaRepeat = num;
-            if (form.aisRealAtoNRadio.checked && navAidSimType === aisSimulator.eAtoN.Real) {
+            if (form.aisRealAtoNRadio.checked && navAidSimType === eAtoN.Real) {
                 aisParameters.navAidSimType = navAidSimType;
             }
-            else if (form.aisVirtualAtoNRadio.checked && navAidSimType === aisSimulator.eAtoN.Virtual) {
+            else if (form.aisVirtualAtoNRadio.checked && navAidSimType === eAtoN.Virtual) {
                 aisParameters.navAidSimType = navAidSimType;
             }
             else {
-                aisParameters.navAidSimType = aisSimulator.eAtoN.Unknown;
+                aisParameters.navAidSimType = eAtoN.Unknown;
             }
             num = parseInt(form.aisAtoNTypeSelect.value, 10);
             if (num < 0 || num > 31) {
@@ -343,14 +361,14 @@ var aisSimulator;
                 return;
             }
             aisParameters.quiet = num;
-            if (form.aisStaticReportTypeARadio.checked && msgType24 === aisSimulator.eMessageType24.TypeA) {
+            if (form.aisStaticReportTypeARadio.checked && msgType24 === eMessageType24.TypeA) {
                 aisParameters.msgType24 = msgType24;
             }
-            else if (form.aisStaticReportTypeBRadio.checked && msgType24 === aisSimulator.eMessageType24.TypeB) {
+            else if (form.aisStaticReportTypeBRadio.checked && msgType24 === eMessageType24.TypeB) {
                 aisParameters.msgType24 = msgType24;
             }
             else {
-                aisParameters.msgType24 = aisSimulator.eMessageType24.Unknown;
+                aisParameters.msgType24 = eMessageType24.Unknown;
             }
             if (form.aisVesselNameInput.value.length < 1 || form.aisVesselNameInput.value.length > 20) {
                 form.aisVesselNameInput.classList.replace("is-valid", "is-invalid");
@@ -362,6 +380,11 @@ var aisSimulator;
                 return;
             }
             aisParameters.callsign = form.aisVesselCallsignInput.value;
+            if (form.aisVesselDestinationInput.value.length < 1 || form.aisVesselDestinationInput.value.length > 20) {
+                form.aisVesselDestinationInput.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            aisParameters.destination = form.aisVesselDestinationInput.value;
             num = parseInt(form.aisVesselTypeSelect.value, 10);
             if (num < 0 || num > 99) {
                 form.aisVesselTypeSelect.classList.replace("is-valid", "is-invalid");
@@ -380,6 +403,24 @@ var aisSimulator;
                 return;
             }
             aisParameters.beam = num;
+            num = parseFloat(form.aisVesselDraughtInput.value);
+            if (num < 0) {
+                form.aisVesselDraughtInput.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            if (num > 25.5) {
+                num = 25.5;
+            }
+            aisParameters.draught = num * 10;
+            num = Date.parse(form.aisEtaInput.value);
+            if (num === Number.NaN) {
+                form.aisEtaInput.classList.replace("is-valid", "is-invalid");
+                return;
+            }
+            const d = new Date();
+            d.setTime(num);
+            aisParameters.eta = d;
+            aisSimulator.AivdmEncoder.encoderTest();
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(aisSimulator.AivdmEncoder.encodeMsg(aisParameters));
                 new Noty({

@@ -54,8 +54,10 @@ declare namespace aisSimulator {
         aisAltitudeInput: HTMLInputElement;
         aisAddrMsgInput: HTMLInputElement;
         aisDestMmsiInput: HTMLInputElement;
+        aisVesselDraughtInput: HTMLInputElement;
+        aisVesselDestinationInput: HTMLInputElement;
+        aisEtaInput: HTMLInputElement;
     }
-
 
     export interface IAisParameter {
         addrMsg: string;
@@ -65,7 +67,10 @@ declare namespace aisSimulator {
         channelA: number;
         channelB: number;
         course: number;
+        destination: string;
         destMmsi: number;
+        draught: number;
+        eta: Date;
         fatdmaOffset: number;
         fatdmaRepeat: number;
         fatdmaSlot: number;
@@ -90,18 +95,6 @@ declare namespace aisSimulator {
         swLat: number;
         swLon: number;
         type: number;
-    }
-
-    export enum eMessageType24 {
-        Unknown = 0,
-        TypeA = 1,
-        TypeB = 2,
-    }
-
-    export enum eAtoN {
-        Unknown = 0,
-        Real = 1,
-        Virtual = 2,
     }
 
     export interface INavPoint {

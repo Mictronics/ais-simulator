@@ -25,6 +25,8 @@ namespace aisSimulator {
                     return this.encodeMsgType1(ap.srcMmsi, ap.status, ap.speed, ap.course, ap.posLat, ap.posLon);
                 case 4:
                     return this.encodeMsgType4(ap.srcMmsi, ap.posLat, ap.posLon);
+                case 5:
+                    return this.encodeMsgType5(ap.srcMmsi, ap.callsign, ap.name, ap.type, ap.length, ap.beam, ap.eta, ap.draught, ap.destination);
                 case 9:
                     return this.encodeMsgType9(ap.srcMmsi, ap.altitude, ap.speed, ap.course, ap.posLat, ap.posLon);
                 case 12:
@@ -63,7 +65,10 @@ namespace aisSimulator {
                 channelA: 2087,
                 channelB: 2088,
                 course: 83.4,
+                destination: "Unknown",
                 destMmsi: 247320163,
+                draught: 10,
+                eta: new Date(),
                 fatdmaOffset: 0,
                 fatdmaRepeat: 0,
                 fatdmaSlot: 0,
@@ -95,6 +100,9 @@ namespace aisSimulator {
 
             s = this.encodeMsgType4(ap.srcMmsi, ap.posLat, ap.posLon);
             console.assert(s.length === 168);
+
+            s = this.encodeMsgType5(ap.srcMmsi, "01234567", "01234567890123456789", ap.type, ap.length, ap.beam, ap.eta, ap.draught, "01234567890123456789");
+            console.assert(s.length === 424);
 
             s = this.encodeMsgType9(ap.srcMmsi, ap.altitude, ap.speed, ap.course, ap.posLat, ap.posLon);
             console.assert(s.length === 168);
@@ -211,7 +219,7 @@ namespace aisSimulator {
          * @param lat Position latitude
          * @param lon Position longitude
          */
-        private static encodeMsgType1(mmsi: number, status: number, speed: number, course: number, lat: number, lon: number) {
+        private static encodeMsgType1(mmsi: number, status: number, speed: number, course: number, lat: number, lon: number): string {
             const header = this.getMsgHeader(1, mmsi, 3);
             const bStatus = status.toString(2).padStart(4, "0"); //  Navigation status e.g. 0 = Under way using engine, 1 - At anchor, 5 = Moored, 8 = Sailing, 15 = undefined
             const bRot = "10000000"; // 128, rate of turn not defined
@@ -243,7 +251,7 @@ namespace aisSimulator {
          * @param lat Position latitude
          * @param lon Position longitude
          */
-        private static encodeMsgType4(mmsi: number, lat: number, lon: number) {
+        private static encodeMsgType4(mmsi: number, lat: number, lon: number): string {
             const header = this.getMsgHeader(4, mmsi, 3);
             const now = new Date();
             const bYear = now.getUTCFullYear().toString(2).padStart(14, "0");
@@ -261,6 +269,47 @@ namespace aisSimulator {
         }
 
         /**
+         * Static and voyage related data
+         * by mobile station.
+         * @param mmsi MMSI
+         * @param callsign Vessel callsign
+         * @param name Vessel name
+         * @param length Vessel length
+         * @param beam Vessel width
+         * @param eta Estimated time of arrival
+         * @param draught Draught
+         * @param destination Vessel destination
+         */
+        private static encodeMsgType5(mmsi: number, vCallsign: string, vName: string, vType: number, vLength: number, vBeam: number, eta: Date, draught: number, vDestination: string): string {
+            const header = this.getMsgHeader(5, mmsi, 3);
+            const bAisVer = "00"; // AIS version ITU1371
+            const bImo = "000000000000000000000000000000"; // IMO ID all zero for inland vessel
+            let n = vName.substr(0, 20);
+            const bName = this.encodeString(n);
+            const padName = "".padStart(120 - bName.length, "0");
+            const bVtype = vType.toString(2).padStart(8, "0"); // Vessel type
+            n = vCallsign.substr(0, 7);
+            const bCallsign = this.encodeString(n);
+            const padCallsign = "".padEnd(42 - bCallsign.length, "0"); // Max 7 six-bit characters
+            // AIS antenna in the middle
+            const hl = (vLength / 2).toString(2).padStart(9, "0");
+            const hw = (vBeam / 2).toString(2).padStart(6, "0");
+            const bMonth = eta.getUTCMonth().toString(2).padStart(6, "0");
+            const bDay = eta.getUTCDay().toString(2).padStart(6, "0");
+            const bHour = eta.getUTCHours().toString(2).padStart(6, "0");
+            const bMin = eta.getUTCMinutes().toString(2).padStart(6, "0");
+            const bEta = bMonth + bDay + bHour + bMin;
+            const bFix = "0001"; // GPS
+            const bDraught = draught.toString(2).padStart(8, "0"); // Draught in 1/10m
+            n = vDestination.substr(0, 20);
+            const bDestination = this.encodeString(n);
+            const padDestination = "".padStart(120 - bDestination.length, "0");
+            const bDTE = "10";
+
+            return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + hl + hl + hw + hw + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
+        }
+
+        /**
          * Standard SAR Aircraft Position Report
          * by mobile station
          * @param mmsi MMSI
@@ -270,7 +319,7 @@ namespace aisSimulator {
          * @param lat Position latitude
          * @param lon Position longitude
          */
-        private static encodeMsgType9(mmsi: number, altitude: number, speed: number, course: number, lat: number, lon: number) {
+        private static encodeMsgType9(mmsi: number, altitude: number, speed: number, course: number, lat: number, lon: number): string {
             const header = this.getMsgHeader(9, mmsi, 3);
             const bAlt = altitude.toString(2).padStart(12, "0");
             let bSpeed = "1111111111"; // 1023 = speed is not available.
@@ -300,7 +349,7 @@ namespace aisSimulator {
          * @param destMmsi Destination MMSI
          * @param msg Message 1-156 characters
          */
-        private static encodeMsgType12(sourceMmsi: number, destMmsi: number, msg: string) {
+        private static encodeMsgType12(sourceMmsi: number, destMmsi: number, msg: string): string {
             const header = this.getMsgHeader(12, sourceMmsi, 3);
             const bSeq = "00"; // Sequence number
             const bDestMmsi = destMmsi.toString(2).padStart(30, "0");
@@ -316,7 +365,7 @@ namespace aisSimulator {
          * @param mmsi MMSI
          * @param msg Message 1-161 characters length
          */
-        private static encodeMsgType14(mmsi: number, msg: string) {
+        private static encodeMsgType14(mmsi: number, msg: string): string {
             const header = this.getMsgHeader(14, mmsi, 3);
             const bSpare = "00"; // Spare bit
             const bMsg = this.encodeString(msg.substr(0, 161));
@@ -332,7 +381,7 @@ namespace aisSimulator {
          * @param lat Position latitude
          * @param lon Position Longitude
          */
-        private static encodeMsgType18(mmsi: number, speed: number, course: number, lat: number, lon: number) {
+        private static encodeMsgType18(mmsi: number, speed: number, course: number, lat: number, lon: number): string {
             const header = this.getMsgHeader(18, mmsi, 3);
             const bReserved = "00000000";
             let bSpeed = "1111111111"; // 1023 = speed is not available.
@@ -376,7 +425,7 @@ namespace aisSimulator {
          * @param vLength Vessel length
          * @param vBeam Vessel width
          */
-        private static encodeMsgType19(mmsi: number, speed: number, course: number, lat: number, lon: number, vName: string, vType: number, vLength: number, vBeam: number) {
+        private static encodeMsgType19(mmsi: number, speed: number, course: number, lat: number, lon: number, vName: string, vType: number, vLength: number, vBeam: number): string {
             const header = this.getMsgHeader(19, mmsi, 3);
             const bReserved1 = "00000000";
             let bSpeed = "1111111111"; // 1023 = speed is not available.
@@ -416,7 +465,7 @@ namespace aisSimulator {
          * @param timeout Allocation timeout in minutes
          * @param increment Repeat increment
          */
-        private static encodeMsgType20(mmsi: number, offset: number, slot: number, timeout: number, increment: number) {
+        private static encodeMsgType20(mmsi: number, offset: number, slot: number, timeout: number, increment: number): string {
             const header = this.getMsgHeader(20, mmsi, 3);
             const bOffset = offset.toString(2).padStart(12, "0");
             const bSlots = slot.toString(2).padStart(4, "0");
@@ -437,7 +486,7 @@ namespace aisSimulator {
          * @param vBeam Beam port to starport
          * @param navaidSimType Real or virtual navigation aid at position
          */
-        private static encodeMsgType21(mmsi: number, navaidType: number, navaidName: string, lat: number, lon: number, vLength: number, vBeam: number, navaidSimType: number) {
+        private static encodeMsgType21(mmsi: number, navaidType: number, navaidName: string, lat: number, lon: number, vLength: number, vBeam: number, navaidSimType: number): string {
             const header = this.getMsgHeader(21, mmsi, 3);
             const bNavaidType = navaidType.toString(2).padStart(5, "0");
             let bNameExt = "";
@@ -483,7 +532,7 @@ namespace aisSimulator {
          * @param swLat Latitude of area, lower left corner (south-west)
          * @param swLon Longitude of area, lower left corner (south-west)
          */
-        private static encodeMsgType22(mmsi: number, channelA: number, channelB: number, neLat: number, neLon: number, swLat: number, swLon: number) {
+        private static encodeMsgType22(mmsi: number, channelA: number, channelB: number, neLat: number, neLon: number, swLat: number, swLon: number): string {
             const header = this.getMsgHeader(22, mmsi, 3);
             const bChannelA = channelA.toString(2).padStart(12, "0");
             const bChannelB = channelB.toString(2).padStart(12, "0");
@@ -506,7 +555,7 @@ namespace aisSimulator {
          * @param interval Report interval
          * @param quiet Quiet time
          */
-        private static encodeMsgType23(mmsi: number, neLat: number, neLon: number, swLat: number, swLon: number, interval: number, quiet: number) {
+        private static encodeMsgType23(mmsi: number, neLat: number, neLon: number, swLat: number, swLon: number, interval: number, quiet: number): string {
             const header = this.getMsgHeader(23, mmsi, 3);
             const bNELatLon = this.convertLatLonShort(neLat, neLon);
             const bSWLatLon = this.convertLatLonShort(swLat, swLon);
@@ -529,7 +578,7 @@ namespace aisSimulator {
          * @param vBeam Beam port to starport
          * @param vType Vessel Type
          */
-        private static encodeMsgType24(mmsi: number, msgType: number, vName: string, vCallsign: string, vLength: number, vBeam: number, vType: number) {
+        private static encodeMsgType24(mmsi: number, msgType: number, vName: string, vCallsign: string, vLength: number, vBeam: number, vType: number): string {
             const header = this.getMsgHeader(24, mmsi, 3);
             let part = "00"; // Message type A
             let n = vName.substr(0, 20);

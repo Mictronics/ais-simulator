@@ -44,6 +44,7 @@
             <option value="0">Select</option>
             <option value="1">Type 1: Position Report Class A</option>
             <option value="4">Type 4: Base Station Report</option>
+            <option value="5">Type 5: Static and Voyage Related Report</option>
             <option value="9">Type 9: SAR Aircraft Position Report</option>
             <option value="12"
               >Type 12: Addressed Safety-Related Message</option
@@ -64,7 +65,7 @@
             <option value="24">Type 24: Static Data Report</option>
           </select>
         </div>
-        <div class="form-group msgType12">
+        <div class="form-group formDestMmsi">
           <label for="aisDestMmsiInput">Destination MMSI</label>
           <input
             type="text"
@@ -80,8 +81,8 @@
             >(9 numeric digits) Encoder default = 247320163
           </small>
         </div>
-        <div class="form-group msgType12">
-          <label for="aisAddrMSgInput">Message</label>
+        <div class="form-group formAddrMsg">
+          <label for="aisAddrMsgInput">Message</label>
           <input
             type="text"
             size="156"
@@ -97,8 +98,8 @@
             >Enter message (1-156 characters)
           </small>
         </div>
-        <div class="form-group msgType14">
-          <label for="aisSartMSgInput">SART Message</label>
+        <div class="form-group formSartMsg">
+          <label for="aisSartMsgInput">SART Message</label>
           <input
             type="text"
             size="161"
@@ -115,7 +116,7 @@
             ACTIVE'
           </small>
         </div>
-        <div class="form-group msgType1-4-18">
+        <div class="form-group formPosLat">
           <label for="aisLatInput">Position Latitude</label>
           <input
             type="number"
@@ -134,7 +135,7 @@
             >Enter latitude (-90 to 90); Encoder default = 48.0
           </small>
         </div>
-        <div class="form-group msgType1-4-18">
+        <div class="form-group formPosLon">
           <label for="aisLonInput">Position Longitude</label>
           <input
             type="number"
@@ -153,7 +154,7 @@
             >Enter longitude (-180 to 180); Encoder default = 10.0
           </small>
         </div>
-        <div class="form-group msgType9">
+        <div class="form-group formAlt">
           <label for="aisAltitudeInput">Altitude</label>
           <input
             type="number"
@@ -173,7 +174,7 @@
             not available); Encoder default = 1000
           </small>
         </div>
-        <div class="form-group msgType1-9-18">
+        <div class="form-group formSpeed">
           <label for="aisSpeedInput">Speed</label>
           <input
             type="number"
@@ -193,7 +194,7 @@
             0.1
           </small>
         </div>
-        <div class="form-group msgType1-9-18">
+        <div class="form-group formCourse">
           <label for="aisCourseInput">Course</label>
           <input
             type="number"
@@ -213,7 +214,7 @@
             83.4
           </small>
         </div>
-        <div class="form-group msgType1-18">
+        <div class="form-group formNavStatus">
           <label for="aisNavStatusSelect">Navigation Status</label>
           <select id="aisNavStatusSelect" class="form-control" required>
             <option value="0">Under way using engine</option>
@@ -229,7 +230,7 @@
             <option value="15" selected>Not defined</option>
           </select>
         </div>
-        <div class="form-group msgType20">
+        <div class="form-group formFatdma">
           <label for="aisFatdmaOffsetInput">FATDMA Offset</label>
           <input
             type="number"
@@ -248,7 +249,7 @@
             >Enter FATDMA reserved offset number (0-4095); Encoder default = 0
           </small>
         </div>
-        <div class="form-group msgType20">
+        <div class="form-group formFatdma">
           <label for="aisFatdmaSlotsInput">FATDMA Slots</label>
           <input
             type="number"
@@ -267,7 +268,7 @@
             >Enter FATDMA number of reserved slots (0-15); Encoder default = 0
           </small>
         </div>
-        <div class="form-group msgType20">
+        <div class="form-group formFatdma">
           <label for="aisTimestampInput">FATDMA Timeout</label>
           <input
             type="number"
@@ -286,7 +287,7 @@
             >Enter FATDMA timeout, in minutes (0-7); Encoder default = 0
           </small>
         </div>
-        <div class="form-group msgType20">
+        <div class="form-group formFatdma">
           <label for="aisFatdmaRepeatInput">FATDMA Repeat Increment</label>
           <input
             type="number"
@@ -305,7 +306,7 @@
             >Enter FATDMA repeat increment (0-2047); Encoder default = 0
           </small>
         </div>
-        <div class="form-group msgType21">
+        <div class="form-group formNavAidType">
           <div class="custom-control custom-radio custom-control-inline">
             <input
               type="radio"
@@ -335,7 +336,7 @@
             station; Encoder default = real
           </small>
         </div>
-        <div class="form-group msgType21">
+        <div class="form-group formNavAidType">
           <label for="aisAtoNTypeSelect">Type of Navigational Aid</label>
           <select
             id="aisAtoNTypeSelect"
@@ -385,7 +386,7 @@
             >Select type of navigational aid; Encoder default = Reference point
           </small>
         </div>
-        <div class="form-group msgType21">
+        <div class="form-group formNavAidName">
           <label for="aisAtoNNameInput">Aid-to-Navigation name</label>
           <input
             type="text"
@@ -402,7 +403,7 @@
             @@@@@@@@@@@@@@@@@@@@
           </small>
         </div>
-        <div class="form-group msgType22">
+        <div class="form-group formAisChannel">
           <label for="aisChannelAInput">AIS Channel A</label>
           <input
             type="number"
@@ -420,7 +421,7 @@
             default = 2087 (87B = 161.975 MHz)
           </small>
         </div>
-        <div class="form-group msgType22">
+        <div class="form-group formAisChannel">
           <label for="aisChannelBInput">AIS Channel B</label>
           <input
             type="number"
@@ -438,7 +439,7 @@
             default = 2088 (88B = 162.025 MHz)
           </small>
         </div>
-        <div class="form-group msgType22-23">
+        <div class="form-group formAisRectangle">
           <label for="aisNELatInput">North East Latitude</label>
           <input
             type="number"
@@ -458,7 +459,7 @@
             (-90 to 90)<br />Encoder default = 47.5
           </small>
         </div>
-        <div class="form-group msgType22-23">
+        <div class="form-group formAisRectangle">
           <label for="aisNELonInput">North East Longitude</label>
           <input
             type="number"
@@ -478,7 +479,7 @@
             9.5
           </small>
         </div>
-        <div class="form-group msgType22-23">
+        <div class="form-group formAisRectangle">
           <label for="aisSWLatInput">South West Latitude</label>
           <input
             type="number"
@@ -498,7 +499,7 @@
             (-90 to 90)<br />Encoder default = 48.5
           </small>
         </div>
-        <div class="form-group msgType22-23">
+        <div class="form-group formAisRectangle">
           <label for="aisSWLonInput">South West Longitude</label>
           <input
             type="number"
@@ -518,7 +519,7 @@
             10.5
           </small>
         </div>
-        <div class="form-group msgType23">
+        <div class="form-group formReportInterval">
           <label for="aisReportingIntervalSelect">Reporting Interval</label>
           <select id="aisReportingIntervalSelect" class="form-control" required>
             <option value="0">As given by the autonomous mode</option>
@@ -534,7 +535,7 @@
             <option value="10">Next longer reporting interval</option>
           </select>
         </div>
-        <div class="form-group msgType23">
+        <div class="form-group formQuietTime">
           <label for="aisQuietTimeInput">Station Quiet Time</label>
           <input
             type="number"
@@ -554,7 +555,7 @@
             default = 15</small
           >
         </div>
-        <div class="form-group msgType24">
+        <div class="form-group formNameCallsignRadio">
           <div class="custom-control custom-radio custom-control-inline">
             <input
               type="radio"
@@ -582,7 +583,7 @@
             = Name
           </small>
         </div>
-        <div class="form-group msgType24A">
+        <div class="form-group formVesselName">
           <label for="aisVesselNameInput">Vessel Name</label>
           <input
             type="text"
@@ -598,7 +599,7 @@
             >Enter vessel name (1-20 characters); Encoder default = Unknown
           </small>
         </div>
-        <div class="form-group msgType24B">
+        <div class="form-group formVesselCallsign">
           <label for="aisVesselCallsignInput">Vessel Callsign</label>
           <input
             type="text"
@@ -614,7 +615,24 @@
             >Enter vessel call sign (1-7 characters); Encoder default = KC9CAF
           </small>
         </div>
-        <div class="form-group msgType19-24B">
+        <div class="form-group formVesselDestination">
+          <label for="aisVesselNameInput">Vessel Destination</label>
+          <input
+            type="text"
+            id="aisVesselDestinationInput"
+            class="form-control"
+            aria-describedby="aisVesselDestinationInputHelp"
+            minlength="1"
+            maxlength="20"
+            value="Unknown"
+            required
+          />
+          <small id="aisVesselDestinationInputHelp" class="form-text text-muted"
+            >Enter vessel destination (1-20 characters); Encoder default =
+            Unknown
+          </small>
+        </div>
+        <div class="form-group formVesselType">
           <label for="aisVesselTypeSelect">Vessel Type</label>
           <select id="aisVesselTypeSelect" class="form-control" required>
             <option value="0">Not available</option>
@@ -647,7 +665,7 @@
             <option value="56">56-57 Spare</option>
           </select>
         </div>
-        <div class="form-group msgType21-24B">
+        <div class="form-group formLength">
           <label for="aisVesselLengthInput">Vessel Length</label>
           <input
             type="number"
@@ -667,7 +685,7 @@
             default = 90</small
           >
         </div>
-        <div class="form-group msgType21-24B">
+        <div class="form-group formBeam">
           <label for="aisVesselBeamInput">Vessel Beam</label>
           <input
             type="number"
@@ -685,6 +703,40 @@
           <small id="aisVesselBeamInputHelp" class="form-text text-muted"
             >Enter vessel beam, in meters (even number, 0-126); Encoder default
             = 14</small
+          >
+        </div>
+        <div class="form-group formDraught">
+          <label for="aisVesselBeamInput">Vessel Draught</label>
+          <input
+            type="number"
+            id="aisVesselDraughtInput"
+            class="form-control"
+            aria-describedby="aisVesselDraughtInputHelp"
+            min="0"
+            max="30"
+            minlength="1"
+            maxlength="3"
+            step="0.1"
+            value="2.5"
+            required
+          />
+          <small id="aisVesselDraughtInputHelp" class="form-text text-muted"
+            >Enter vessel draught, in meters (0-30); Encoder default =
+            2.5</small
+          >
+        </div>
+        <div class="form-group formEta">
+          <label for="aisEtaInput">Estimated Time of Arrival</label>
+          <input
+            type="datetime-local"
+            id="aisEtaInput"
+            class="form-control"
+            aria-describedby="aisEtaInputHelp"
+            pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
+            required
+          />
+          <small id="aisEtaInputHelp" class="form-text text-muted"
+            >Enter estimated time of arrival.</small
           >
         </div>
         <button

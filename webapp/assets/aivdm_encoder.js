@@ -8,6 +8,8 @@ var aisSimulator;
                     return this.encodeMsgType1(ap.srcMmsi, ap.status, ap.speed, ap.course, ap.posLat, ap.posLon);
                 case 4:
                     return this.encodeMsgType4(ap.srcMmsi, ap.posLat, ap.posLon);
+                case 5:
+                    return this.encodeMsgType5(ap.srcMmsi, ap.callsign, ap.name, ap.type, ap.length, ap.beam, ap.eta, ap.draught, ap.destination);
                 case 9:
                     return this.encodeMsgType9(ap.srcMmsi, ap.altitude, ap.speed, ap.course, ap.posLat, ap.posLon);
                 case 12:
@@ -41,7 +43,10 @@ var aisSimulator;
                 channelA: 2087,
                 channelB: 2088,
                 course: 83.4,
+                destination: "Waterworld",
                 destMmsi: 247320163,
+                draught: 10,
+                eta: new Date(),
                 fatdmaOffset: 0,
                 fatdmaRepeat: 0,
                 fatdmaSlot: 0,
@@ -71,6 +76,8 @@ var aisSimulator;
             console.assert(s.length === 168);
             s = this.encodeMsgType4(ap.srcMmsi, ap.posLat, ap.posLon);
             console.assert(s.length === 168);
+            s = this.encodeMsgType5(ap.srcMmsi, "01234567", "01234567890123456789", ap.type, ap.length, ap.beam, ap.eta, ap.draught, "01234567890123456789");
+            console.assert(s.length === 424);
             s = this.encodeMsgType9(ap.srcMmsi, ap.altitude, ap.speed, ap.course, ap.posLat, ap.posLon);
             console.assert(s.length === 168);
             s = this.encodeMsgType12(ap.srcMmsi, 247320152, "1");
@@ -173,6 +180,32 @@ var aisSimulator;
             const bFlags = "00000000000";
             const bRadioStatus = "0000000000000000000";
             return header + bYear + bMonth + bDay + bHour + bMin + bSec + bAccuracy + bLatLon[1] + bLatLon[0] + bDevice + bFlags + bRadioStatus;
+        }
+        static encodeMsgType5(mmsi, vCallsign, vName, vType, vLength, vBeam, eta, draught, vDestination) {
+            const header = this.getMsgHeader(5, mmsi, 3);
+            const bAisVer = "00";
+            const bImo = "000000000000000000000000000000";
+            let n = vName.substr(0, 20);
+            const bName = this.encodeString(n);
+            const padName = "".padStart(120 - bName.length, "0");
+            const bVtype = vType.toString(2).padStart(8, "0");
+            n = vCallsign.substr(0, 7);
+            const bCallsign = this.encodeString(n);
+            const padCallsign = "".padEnd(42 - bCallsign.length, "0");
+            const hl = (vLength / 2).toString(2).padStart(9, "0");
+            const hw = (vBeam / 2).toString(2).padStart(6, "0");
+            const bMonth = eta.getUTCMonth().toString(2).padStart(6, "0");
+            const bDay = eta.getUTCDay().toString(2).padStart(6, "0");
+            const bHour = eta.getUTCHours().toString(2).padStart(6, "0");
+            const bMin = eta.getUTCMinutes().toString(2).padStart(6, "0");
+            const bEta = bMonth + bDay + bHour + bMin;
+            const bFix = "0001";
+            const bDraught = draught.toString(2).padStart(8, "0");
+            n = vDestination.substr(0, 20);
+            const bDestination = this.encodeString(n);
+            const padDestination = "".padStart(120 - bDestination.length, "0");
+            const bDTE = "10";
+            return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + hl + hl + hw + hw + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
         }
         static encodeMsgType9(mmsi, altitude, speed, course, lat, lon) {
             const header = this.getMsgHeader(9, mmsi, 3);
