@@ -303,8 +303,8 @@ namespace aisSimulator {
             // AIS antenna in the middle
             const hl = (vLength / 2).toString(2).padStart(9, "0");
             const hw = (vBeam / 2).toString(2).padStart(6, "0");
-            const bMonth = eta.getUTCMonth().toString(2).padStart(4, "0");
-            const bDay = eta.getUTCDay().toString(2).padStart(5, "0");
+            const bMonth = (eta.getUTCMonth() + 1).toString(2).padStart(4, "0");
+            const bDay = eta.getUTCDate().toString(2).padStart(5, "0");
             const bHour = eta.getUTCHours().toString(2).padStart(5, "0");
             const bMin = eta.getUTCMinutes().toString(2).padStart(6, "0");
             const bEta = bMonth + bDay + bHour + bMin;
