@@ -40,6 +40,7 @@ namespace gr
         protected:
             static const char preamble[24];
             static const char start_mark[8];
+            static const unsigned short crc_itu16_table[256];
             int calculate_output_stream_length(const gr_vector_int &ninput_items);
             bool set_sentence(const char *sentence);
             void dump_buffer(const char *b, int buffer_size);
