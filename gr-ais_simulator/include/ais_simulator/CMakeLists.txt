@@ -23,7 +23,6 @@
 ########################################################################
 install(FILES
     api.h
-    build_frame.h
     bitstring_to_frame.h
     websocket_pdu.h DESTINATION include/ais_simulator
 )

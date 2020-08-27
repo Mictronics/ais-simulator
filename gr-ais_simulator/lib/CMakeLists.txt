@@ -23,7 +23,6 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 list(APPEND ais_simulator_sources
-    build_frame_impl.cc
     bitstring_to_frame_impl.cc
     websocket_pdu_impl.cc )
 

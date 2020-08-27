@@ -42,4 +42,3 @@ include(GrTest)
 
 set(GR_TEST_TARGET_DEPS gnuradio-ais_simulator)
 set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/swig)
-GR_ADD_TEST(qa_build_frame ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_build_frame.py)
