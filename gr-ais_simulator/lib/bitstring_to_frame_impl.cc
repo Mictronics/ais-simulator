@@ -89,7 +89,7 @@ namespace gr
                                       gr::io_signature::make(1, 1, sizeof(unsigned char)), len_tag_key),
               d_enable_nrzi(enable_nrzi)
         {
-            payload = (char *)calloc(4096, sizeof(char));
+            d_payload = (char *)calloc(4096, sizeof(char));
         }
 
         /*
@@ -97,9 +97,9 @@ namespace gr
          */
         bitstring_to_frame_impl::~bitstring_to_frame_impl()
         {
-            if (payload)
+            if (d_payload)
             {
-                free((char *)payload);
+                free((char *)d_payload);
             }
         }
 
@@ -107,65 +107,65 @@ namespace gr
         bool bitstring_to_frame_impl::set_sentence(const char *sentence)
         {
             unsigned short reminder_to_eight, padding_to_eight; // to pad the payload to a multiple of 8
-            len_payload = strlen(sentence);
-            if (len_payload > 1)
+            d_len_payload = strlen(sentence);
+            if (d_len_payload > 1)
             {
                 //check where \n char is, if any
-                for (int l = 0; l < len_payload; l++)
+                for (int l = 0; l < d_len_payload; l++)
                 {
                     if (sentence[l] == '\n')
                     {
                         //define the limit of the char array where the \n was
-                        len_payload = l;
+                        d_len_payload = l;
                         break;
                     }
                 }
             }
 
             // Don't build a frame from zero length input
-            if (len_payload == 0)
+            if (d_len_payload == 0)
             {
                 return false;
             }
 
             // Prevent buffer overflow when copying sentence to payload buffer
-            if ((LEN_PREAMBLE + LEN_START + len_payload + LEN_CRC) > 4096)
+            if ((LEN_PREAMBLE + LEN_START + d_len_payload + LEN_CRC) > 4096)
             {
-                len_payload = 4096 - LEN_CRC - LEN_PREAMBLE - LEN_START;
+                d_len_payload = 4096 - LEN_CRC - LEN_PREAMBLE - LEN_START;
             }
-            reminder_to_eight = len_payload % 8;
+            reminder_to_eight = d_len_payload % 8;
             if (reminder_to_eight == 0)
             {
                 // nb. It comes in in ASCII
-                for (int i = 0; i < len_payload; i++)
+                for (int i = 0; i < d_len_payload; i++)
                 {
-                    payload[i] = sentence[i] - 48;
+                    d_payload[i] = sentence[i] - 48;
                 }
             }
             else if (reminder_to_eight > 0)
             {
                 padding_to_eight = 8 - reminder_to_eight;
-                for (int i = 0; i < len_payload; i++)
+                for (int i = 0; i < d_len_payload; i++)
                 {
-                    payload[i] = sentence[i] - 48;
+                    d_payload[i] = sentence[i] - 48;
                 }
 
                 //printf("Payload is *not* multiple of 8 (%d bits). Padding with %d bits to %d\n", len_payload, padding_to_eight, len_payload + padding_to_eight);
                 GR_LOG_DEBUG(d_logger, "Payload is *not* multiple of 8. Padding.");
-                memset(payload + len_payload, 0x0, padding_to_eight);
-                len_payload += padding_to_eight;
+                memset(d_payload + d_len_payload, 0x0, padding_to_eight);
+                d_len_payload += padding_to_eight;
             }
 
             //dump_buffer(payload, len_payload);
 
             char crc[16]; // 2 gnuradio bytes of CRC
-            char *input_crc = (char *)malloc(len_payload);
-            memcpy(input_crc, payload, len_payload);
-            compute_crc(input_crc, crc, len_payload);
-            memcpy(payload + len_payload, crc, LEN_CRC);
+            char *input_crc = (char *)malloc(d_len_payload);
+            memcpy(input_crc, d_payload, d_len_payload);
+            compute_crc(input_crc, crc, d_len_payload);
+            memcpy(d_payload + d_len_payload, crc, LEN_CRC);
 
             // reverse
-            reverse_bit_order(payload, len_payload + LEN_CRC);
+            reverse_bit_order(d_payload, d_len_payload + LEN_CRC);
 
             GR_LOG_INFO(d_logger, "Sentence changed!");
             //printf("%d bits, reminder %d\n", len_payload, reminder_to_eight);
@@ -393,10 +393,10 @@ namespace gr
 
             char *frame;
             unsigned char *byte_frame;
-            if (len_payload <= 168)
+            if (d_len_payload <= 168)
             {
                 char stuffed_payload[LEN_FRAME_MAX];
-                int len_stuffed_payload = stuff(payload, stuffed_payload, len_payload + LEN_CRC);
+                int len_stuffed_payload = stuff(d_payload, stuffed_payload, d_len_payload + LEN_CRC);
 
                 //// frame generation /////
                 frame = (char *)malloc(LEN_FRAME_MAX);
@@ -412,8 +412,8 @@ namespace gr
                 memcpy(frame + LEN_PREAMBLE + LEN_START + len_stuffed_payload, start_mark, 8);
 
                 // padding
-                int LEN_PADDING = LEN_FRAME_MAX - (LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START);
-                memset(frame + LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START, 0x0, LEN_PADDING);
+                int len_padding = LEN_FRAME_MAX - (LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START);
+                memset(frame + LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START, 0x0, len_padding);
                 int len_frame_real = LEN_FRAME_MAX; // 256
 
                 // NRZI Conversion
@@ -431,28 +431,28 @@ namespace gr
             }
             else
             {
-                char *stuffed_payload = (char *)malloc(LEN_PREAMBLE + LEN_START + len_payload + LEN_CRC);
-                int LEN_STUFFED_PAYLOAD = stuff(payload, stuffed_payload, len_payload + LEN_CRC);
+                char *stuffed_payload = (char *)malloc(LEN_PREAMBLE + LEN_START + d_len_payload + LEN_CRC);
+                int len_stuffed_payload = stuff(d_payload, stuffed_payload, d_len_payload + LEN_CRC);
 
                 //// frame generation /////
-                int LEN_FRAME = LEN_PREAMBLE + LEN_START * 2 + LEN_STUFFED_PAYLOAD;
-                while (LEN_FRAME % 8 != 0)
+                int len_frame = LEN_PREAMBLE + LEN_START * 2 + len_stuffed_payload;
+                while (len_frame % 8 != 0)
                 {
-                    LEN_FRAME++;
+                    len_frame++;
                 }
-                frame = (char *)malloc(LEN_FRAME);
-                byte_frame = (unsigned char *)malloc(LEN_FRAME / 8);
-                memset(frame, 0x0, LEN_FRAME);
+                frame = (char *)malloc(len_frame);
+                byte_frame = (unsigned char *)malloc(len_frame / 8);
+                memset(frame, 0x0, len_frame);
 
                 // headers
                 memcpy(frame, preamble, LEN_PREAMBLE);
                 memcpy(frame + LEN_PREAMBLE, start_mark, LEN_START);
                 // payload + crc
-                memcpy(frame + LEN_PREAMBLE + LEN_START, stuffed_payload, LEN_STUFFED_PAYLOAD);
+                memcpy(frame + LEN_PREAMBLE + LEN_START, stuffed_payload, len_stuffed_payload);
                 // trailer
-                memcpy(frame + LEN_PREAMBLE + LEN_START + LEN_STUFFED_PAYLOAD, start_mark, 8);
+                memcpy(frame + LEN_PREAMBLE + LEN_START + len_stuffed_payload, start_mark, 8);
 
-                int len_frame_real = LEN_FRAME;
+                int len_frame_real = len_frame;
 
                 // NRZI Conversion
                 nrz_to_nrzi(frame, len_frame_real);

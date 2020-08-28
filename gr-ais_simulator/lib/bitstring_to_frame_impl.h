@@ -33,8 +33,8 @@ namespace gr
         private:
             bool d_enable_nrzi;
             const char *d_sentence;
-            char *payload;
-            unsigned short len_payload;
+            char *d_payload;
+            unsigned short d_len_payload;
 
         protected:
             static const char preamble[24];
