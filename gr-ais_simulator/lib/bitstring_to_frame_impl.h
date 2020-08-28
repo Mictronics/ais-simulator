@@ -34,7 +34,6 @@ namespace gr
             bool d_enable_nrzi;
             const char *d_sentence;
             char *payload;
-            unsigned short len_sentence;
             unsigned short len_payload;
 
         protected:
