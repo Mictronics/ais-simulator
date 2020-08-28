@@ -151,6 +151,11 @@ var aisSimulator;
             const bMmsi = mmsi.toString(2).padStart(30, "0");
             return bMsgType + bRepeat + bMmsi;
         }
+        static convertVesselSize(length, beam) {
+            const hl = Math.ceil((length / 2)).toString(2).padStart(9, "0");
+            const hw = Math.ceil((beam / 2)).toString(2).padStart(6, "0");
+            return hl + hl + hw + hw;
+        }
         static encodeMsgType1(mmsi, status, speed, course, lat, lon) {
             const header = this.getMsgHeader(1, mmsi, 3);
             const bStatus = status.toString(2).padStart(4, "0");
@@ -199,8 +204,7 @@ var aisSimulator;
             n = vCallsign.substr(0, 7);
             const bCallsign = this.encodeString(n);
             const padCallsign = "".padEnd(42 - bCallsign.length, "0");
-            const hl = (vLength / 2).toString(2).padStart(9, "0");
-            const hw = (vBeam / 2).toString(2).padStart(6, "0");
+            const bSize = this.convertVesselSize(vLength, vBeam);
             const bMonth = (eta.getUTCMonth() + 1).toString(2).padStart(4, "0");
             const bDay = eta.getUTCDate().toString(2).padStart(5, "0");
             const bHour = eta.getUTCHours().toString(2).padStart(5, "0");
@@ -212,7 +216,7 @@ var aisSimulator;
             const bDestination = this.encodeString(n);
             const padDestination = "".padStart(120 - bDestination.length, "0");
             const bDTE = "10";
-            return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + hl + hl + hw + hw + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
+            return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + bSize + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
         }
         static encodeMsgType9(mmsi, altitude, speed, course, lat, lon) {
             const header = this.getMsgHeader(9, mmsi, 3);
@@ -293,10 +297,9 @@ var aisSimulator;
             let bName = this.encodeString(vName.substr(0, 20));
             bName += "".padStart(120 - bName.length, "0");
             const bVtype = vType.toString(2).padStart(8, "0");
-            const hl = (vLength / 2).toString(2).padStart(9, "0");
-            const hw = (vBeam / 2).toString(2).padStart(6, "0");
+            const bSize = this.convertVesselSize(vLength, vBeam);
             const bFlags = "00010100000";
-            return header + bReserved1 + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bReserved2 + bName + bVtype + hl + hl + hw + hw + bFlags;
+            return header + bReserved1 + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bReserved2 + bName + bVtype + bSize + bFlags;
         }
         static encodeMsgType20(mmsi, offset, slot, timeout, increment) {
             const header = this.getMsgHeader(20, mmsi, 3);
@@ -327,18 +330,16 @@ var aisSimulator;
             }
             const bAccuracy = "0";
             const bLatLon = this.convertLatLon(lat, lon);
-            let hl = "000000000";
-            let hw = "000000";
+            let bSize = this.convertVesselSize(0, 0);
             let bVirtual = "1";
             if (navaidSimType === aisSimulator.eAtoN.Real) {
-                hl = (vLength / 2).toString(2).padStart(9, "0");
-                hw = (vBeam / 2).toString(2).padStart(6, "0");
+                bSize = this.convertVesselSize(vLength, vBeam);
                 bVirtual = "0";
             }
             const bFix = "0001";
             const now = new Date();
             const bTime = now.getUTCSeconds().toString(2).padStart(6, "0");
-            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + hl + hl + hw + hw + bFix + bTime + "1000000000" + bVirtual + "00" + bNameExt;
+            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + bSize + bFix + bTime + "1000000000" + bVirtual + "00" + bNameExt;
         }
         static encodeMsgType22(mmsi, channelA, channelB, neLat, neLon, swLat, swLon) {
             const header = this.getMsgHeader(22, mmsi, 3);
@@ -378,9 +379,8 @@ var aisSimulator;
             n = vCallsign.substr(0, 7);
             const bCallsign = this.encodeString(n);
             padding = "".padEnd(42 - bCallsign.length, "0");
-            const hl = (vLength / 2).toString(2).padStart(9, "0");
-            const hw = (vBeam / 2).toString(2).padStart(6, "0");
-            return header + part + bVtype + bVendorId + bCallsign + padding + hl + hl + hw + hw + "000000";
+            const bSize = this.convertVesselSize(vLength, vBeam);
+            return header + part + bVtype + bVendorId + bCallsign + padding + bSize + "000000";
         }
     }
     AivdmEncoder.charset = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&'()*+,-./0123456789:;<=>?";

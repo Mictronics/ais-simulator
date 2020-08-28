@@ -219,6 +219,17 @@ namespace aisSimulator {
         }
 
         /**
+         * Encode vessel dimensions, antenna in center.
+         * @param length Vessel length
+         * @param beam Vessel beam
+         */
+        private static convertVesselSize(length: number, beam: number): string {
+            const hl = Math.ceil((length / 2)).toString(2).padStart(9, "0");
+            const hw = Math.ceil((beam / 2)).toString(2).padStart(6, "0");
+            return hl + hl + hw + hw;
+        }
+
+        /**
          * Position Report Class A
          * by mobile station
          * @param mmsi MMSI
@@ -301,8 +312,7 @@ namespace aisSimulator {
             const bCallsign = this.encodeString(n);
             const padCallsign = "".padEnd(42 - bCallsign.length, "0"); // Max 7 six-bit characters
             // AIS antenna in the middle
-            const hl = (vLength / 2).toString(2).padStart(9, "0");
-            const hw = (vBeam / 2).toString(2).padStart(6, "0");
+            const bSize = this.convertVesselSize(vLength, vBeam);
             const bMonth = (eta.getUTCMonth() + 1).toString(2).padStart(4, "0");
             const bDay = eta.getUTCDate().toString(2).padStart(5, "0");
             const bHour = eta.getUTCHours().toString(2).padStart(5, "0");
@@ -315,7 +325,7 @@ namespace aisSimulator {
             const padDestination = "".padStart(120 - bDestination.length, "0");
             const bDTE = "10";
 
-            return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + hl + hl + hw + hw + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
+            return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + bSize + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
         }
 
         /**
@@ -465,10 +475,9 @@ namespace aisSimulator {
             bName += "".padStart(120 - bName.length, "0");
             const bVtype = vType.toString(2).padStart(8, "0"); // Vessel type
             // AIS antenna in the middle
-            const hl = (vLength / 2).toString(2).padStart(9, "0");
-            const hw = (vBeam / 2).toString(2).padStart(6, "0");
+            const bSize = this.convertVesselSize(vLength, vBeam);
             const bFlags = "00010100000";
-            return header + bReserved1 + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bReserved2 + bName + bVtype + hl + hl + hw + hw + bFlags;
+            return header + bReserved1 + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bReserved2 + bName + bVtype + bSize + bFlags;
         }
 
         /**
@@ -522,20 +531,18 @@ namespace aisSimulator {
             }
             const bAccuracy = "0"; // Accuracy > 10m
             const bLatLon = this.convertLatLon(lat, lon);
-            let hl = "000000000";
-            let hw = "000000";
+            let bSize = this.convertVesselSize(0, 0);
             let bVirtual = "1";
             if (navaidSimType === eAtoN.Real) {
                 // AIS antenna in the middle
-                hl = (vLength / 2).toString(2).padStart(9, "0");
-                hw = (vBeam / 2).toString(2).padStart(6, "0");
+                bSize = this.convertVesselSize(vLength, vBeam);
                 bVirtual = "0";
             }
             const bFix = "0001"; // GPS
             const now = new Date();
             const bTime = now.getUTCSeconds().toString(2).padStart(6, "0");
 
-            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + hl + hl + hw + hw + bFix + bTime + "1000000000" + bVirtual + "00" + bNameExt;
+            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + bSize + bFix + bTime + "1000000000" + bVirtual + "00" + bNameExt;
         }
 
         /**
@@ -613,10 +620,9 @@ namespace aisSimulator {
             const bCallsign = this.encodeString(n);
             padding = "".padEnd(42 - bCallsign.length, "0"); // Max 7 six-bit characters
             // AIS antenna in the middle
-            const hl = (vLength / 2).toString(2).padStart(9, "0");
-            const hw = (vBeam / 2).toString(2).padStart(6, "0");
+            const bSize = this.convertVesselSize(vLength, vBeam);
 
-            return header + part + bVtype + bVendorId + bCallsign + padding + hl + hl + hw + hw + "000000";
+            return header + part + bVtype + bVendorId + bCallsign + padding + bSize + "000000";
         }
 
     }
