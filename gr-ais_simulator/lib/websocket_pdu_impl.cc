@@ -303,8 +303,8 @@ namespace gr
          */
         void websocket_pdu_impl::set_msg(pmt::pmt_t msg)
         {
-            d_msg = msg;
-            message_port_pub(d_out_port, msg);
+            std::string s = pmt::symbol_to_string(msg);
+            set_string_msg(s, s.length());
         }
 
         /*
@@ -321,9 +321,9 @@ namespace gr
             pmt::pmt_t d = pmt::make_dict();
             d = pmt::dict_add(d, pmt::string_to_symbol("length"), pmt::from_long(l));
             // Combine meta and vector data
-            pmt::pmt_t pdu = pmt::cons(d, v);
+            d_msg = pmt::cons(d, v);
             // Send message
-            message_port_pub(d_out_port, pdu);
+            message_port_pub(d_out_port, d_msg);
         }
 
     } /* namespace ais_simulator */

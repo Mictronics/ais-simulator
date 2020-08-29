@@ -39,9 +39,10 @@ outputs:
 
 documentation: |-
   This block runs a websocket server on given address and port.
-  Strings send via websocket message are transformed into PDU messages and published
-  on the output port. Each PDU message includes meta data with a length key and length
-  of the string as value.
+
+  Strings send via websocket message or via PDU input port are transformed into PDU
+  messages and published on the output port. Each PDU message includes meta data with
+  a length key and length of the string as value.
 
   Leave listen address blank to bind to all interfaces (equivalent to 0.0.0.0).
 
