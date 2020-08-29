@@ -319,7 +319,7 @@ namespace gr
             // Store length of sentence in message meta data
             // This propagated via tag in tagged stream.
             pmt::pmt_t d = pmt::make_dict();
-            d = pmt::dict_add(d, pmt::string_to_symbol("sentence_length"), pmt::from_long(l));
+            d = pmt::dict_add(d, pmt::string_to_symbol("length"), pmt::from_long(l));
             // Combine meta and vector data
             pmt::pmt_t pdu = pmt::cons(d, v);
             // Send message

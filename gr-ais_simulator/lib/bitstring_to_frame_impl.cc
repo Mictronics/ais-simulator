@@ -389,7 +389,7 @@ namespace gr
             for (const auto &tag : d_tags)
             {
                 // Search for length tag in tagged stream
-                if (pmt::symbol_to_string(tag.key) == "sentence_length")
+                if (pmt::symbol_to_string(tag.key) == "length")
                 {
                     tag_len = pmt::to_long(tag.value);
                 }
