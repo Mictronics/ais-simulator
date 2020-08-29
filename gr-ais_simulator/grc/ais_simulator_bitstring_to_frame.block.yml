@@ -54,6 +54,10 @@ documentation: |-
 
   Output: Byte stream to GMSK modulator.
 
+  Note:
+  For correct function of this block the tagged stream on input requires a tag with meta
+  data that includes a "length" key with sentence length as value.
+
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.
 file_format: 1
