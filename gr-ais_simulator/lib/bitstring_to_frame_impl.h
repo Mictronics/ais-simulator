@@ -35,13 +35,14 @@ namespace gr
             const char *d_sentence;
             char *d_payload;
             unsigned short d_len_payload;
+            std::vector<tag_t> d_tags;
 
         protected:
             static const char preamble[24];
             static const char start_mark[8];
             static const unsigned short crc_itu16_table[256];
             int calculate_output_stream_length(const gr_vector_int &ninput_items);
-            bool set_sentence(const char *sentence);
+            bool set_sentence(const char *sentence, long length);
             void dump_buffer(const char *b, int buffer_size);
             char *int2bin(int a, char *buffer, int buf_size);
             int stuff(const char *in, char *out, int l_in);

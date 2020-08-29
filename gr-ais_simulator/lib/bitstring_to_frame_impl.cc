@@ -104,18 +104,18 @@ namespace gr
         }
 
         /* Public callback to set sentence during runtime via RPC */
-        bool bitstring_to_frame_impl::set_sentence(const char *sentence)
+        bool bitstring_to_frame_impl::set_sentence(const char *sentence, long length)
         {
             unsigned short reminder_to_eight, padding_to_eight; // to pad the payload to a multiple of 8
-            d_len_payload = strlen(sentence);
+            d_len_payload = (unsigned short)length;
             if (d_len_payload > 1)
             {
-                //check where \n char is, if any
+                //check where \n char or end of string is, if any
                 for (int l = 0; l < d_len_payload; l++)
                 {
-                    if (sentence[l] == '\n')
+                    if (sentence[l] == '\n' || sentence[l] == '\0')
                     {
-                        //define the limit of the char array where the \n was
+                        //define the limit of the char array where the \n or end of string was
                         d_len_payload = l;
                         break;
                     }
@@ -156,7 +156,7 @@ namespace gr
                 d_len_payload += padding_to_eight;
             }
 
-            //dump_buffer(payload, len_payload);
+            //dump_buffer(d_payload, d_len_payload);
 
             char crc[16]; // 2 gnuradio bytes of CRC
             char *input_crc = (char *)malloc(d_len_payload);
@@ -384,8 +384,19 @@ namespace gr
                                           gr_vector_void_star &output_items)
         {
             unsigned char *out = (unsigned char *)output_items[0];
+            long tag_len = 0;
+            get_tags_in_range(d_tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0]);
+            for (const auto &tag : d_tags)
+            {
+                // Search for length tag in tagged stream
+                if (pmt::symbol_to_string(tag.key) == "sentence_length")
+                {
+                    tag_len = pmt::to_long(tag.value);
+                }
+            }
+
             // Don't output anything on zero length input.
-            if (set_sentence((const char *)input_items[0]) == false)
+            if (set_sentence((const char *)input_items[0], tag_len) == false)
             {
                 noutput_items = 0;
                 return noutput_items;
