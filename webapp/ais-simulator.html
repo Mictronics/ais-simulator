@@ -26,7 +26,7 @@
           <input
             type="text"
             id="aisMmsiInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisMmsiInputHelp"
             minlength="9"
             maxlength="9"
@@ -40,25 +40,29 @@
         </div>
         <div class="form-group">
           <label for="aisMessageTypeSelect">Message Type</label>
-          <select id="aisMessageTypeSelect" class="form-control" required>
+          <select
+            id="aisMessageTypeSelect"
+            class="form-control form-control-sm"
+            required
+          >
             <option value="0">Select</option>
             <option value="1">Type 1: Position Report Class A</option>
             <option value="4">Type 4: Base Station Report</option>
             <option value="5">Type 5: Static and Voyage Related Report</option>
             <option value="9">Type 9: SAR Aircraft Position Report</option>
-            <option value="12"
-              >Type 12: Addressed Safety-Related Message</option
-            >
-            <option value="14"
-              >Type 14: Safety-Related Broadcast Message</option
-            >
+            <option value="12">
+              Type 12: Addressed Safety-Related Message
+            </option>
+            <option value="14">
+              Type 14: Safety-Related Broadcast Message
+            </option>
             <option value="15">Type 15: Interrogation</option>
-            <option value="18"
-              >Type 18: Standard Class B CS Position Report</option
-            >
-            <option value="19"
-              >Type 19: Extended Class B CS Position Report</option
-            >
+            <option value="18">
+              Type 18: Standard Class B CS Position Report
+            </option>
+            <option value="19">
+              Type 19: Extended Class B CS Position Report
+            </option>
             <option value="20">Type 20: Data Link Management Message</option>
             <option value="21">Type 21: Aid-to-Navigation Report</option>
             <option value="22">Type 22: Channel Management</option>
@@ -71,7 +75,7 @@
           <input
             type="text"
             id="aisDestMmsiInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisDestMmsiInputHelp"
             minlength="9"
             maxlength="9"
@@ -88,7 +92,7 @@
             type="text"
             size="156"
             id="aisAddrMsgInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisAddrMsgInputHelp"
             minlength="1"
             maxlength="156"
@@ -105,7 +109,7 @@
             type="text"
             size="161"
             id="aisSartMsgInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisSartMsgInputHelp"
             minlength="1"
             maxlength="161"
@@ -122,7 +126,7 @@
           <input
             type="number"
             id="aisLatInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisLatInputHelp"
             min="-90"
             max="90"
@@ -141,7 +145,7 @@
           <input
             type="number"
             id="aisLonInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisLonInputHelp"
             min="-180"
             max="180"
@@ -160,7 +164,7 @@
           <input
             type="number"
             id="aisAltitudeInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisAltitudeInputHelp"
             min="0"
             max="4095"
@@ -180,7 +184,7 @@
           <input
             type="number"
             id="aisSpeedInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisSpeedInputHelp"
             min="-1"
             max="100"
@@ -200,7 +204,7 @@
           <input
             type="number"
             id="aisCourseInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisCourseInputHelp"
             min="-1"
             max="359"
@@ -217,7 +221,11 @@
         </div>
         <div class="form-group formNavStatus">
           <label for="aisNavStatusSelect">Navigation Status</label>
-          <select id="aisNavStatusSelect" class="form-control" required>
+          <select
+            id="aisNavStatusSelect"
+            class="form-control form-control-sm"
+            required
+          >
             <option value="0">Under way using engine</option>
             <option value="1">At anchor</option>
             <option value="2">Not under command</option>
@@ -236,7 +244,7 @@
           <input
             type="number"
             id="aisFatdmaOffsetInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisFatdmaOffsetInputHelp"
             min="0"
             max="4095"
@@ -255,7 +263,7 @@
           <input
             type="number"
             id="aisFatdmaSlotsInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisFatdmaSlotsInputHelp"
             min="0"
             max="15"
@@ -274,7 +282,7 @@
           <input
             type="number"
             id="aisFatdmaTimeoutInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisFatdmaTimeoutInputHelp"
             min="0"
             max="7"
@@ -293,7 +301,7 @@
           <input
             type="number"
             id="aisFatdmaRepeatInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisFatdmaRepeatInputHelp"
             min="0"
             max="2047"
@@ -341,19 +349,19 @@
           <label for="aisAtoNTypeSelect">Type of Navigational Aid</label>
           <select
             id="aisAtoNTypeSelect"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisAtoNTypeHelp"
             required
           >
             <option value="0">Not specified</option>
             <option value="1" selected>Reference point</option>
-            <option value="2"
-              >RACON (radar transponder marking a navigation hazard)</option
-            >
-            <option value="3"
-              >Fixed structure off shore, such as oil platforms, wind farms,
-              rigs.</option
-            >
+            <option value="2">
+              RACON (radar transponder marking a navigation hazard)
+            </option>
+            <option value="3">
+              Fixed structure off shore, such as oil platforms, wind farms,
+              rigs.
+            </option>
             <option value="4">Spare, Reserved for future use</option>
             <option value="5">Light, without sectors</option>
             <option value="6">Light, with sectors</option>
@@ -392,7 +400,7 @@
           <input
             type="text"
             id="aisAtoNNameInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisAtoNNameInputHelp"
             minlength="1"
             maxlength="20"
@@ -409,7 +417,7 @@
           <input
             type="number"
             id="aisChannelAInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisChannelAInputHelp"
             minlength="4"
             maxlength="4"
@@ -427,7 +435,7 @@
           <input
             type="number"
             id="aisChannelBInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisChannelBInputHelp"
             minlength="4"
             maxlength="4"
@@ -445,7 +453,7 @@
           <input
             type="number"
             id="aisNELatInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisNELatInputHelp"
             min="-90"
             max="90"
@@ -465,7 +473,7 @@
           <input
             type="number"
             id="aisNELonInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisNELonInputHelp"
             min="-180"
             max="180"
@@ -485,7 +493,7 @@
           <input
             type="number"
             id="aisSWLatInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisSWLatInputHelp"
             min="-90"
             max="90"
@@ -505,7 +513,7 @@
           <input
             type="number"
             id="aisSWLonInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisSWLonInputHelp"
             min="-180"
             max="180"
@@ -522,7 +530,11 @@
         </div>
         <div class="form-group formReportInterval">
           <label for="aisReportingIntervalSelect">Reporting Interval</label>
-          <select id="aisReportingIntervalSelect" class="form-control" required>
+          <select
+            id="aisReportingIntervalSelect"
+            class="form-control form-control-sm"
+            required
+          >
             <option value="0">As given by the autonomous mode</option>
             <option value="1" selected>10 Minutes</option>
             <option value="2">6 Minutes</option>
@@ -541,7 +553,7 @@
           <input
             type="number"
             id="aisQuietTimeInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisQuietTimeInputHelp"
             min="1"
             max="15"
@@ -589,7 +601,7 @@
           <input
             type="text"
             id="aisVesselNameInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisVesselNameInputHelp"
             minlength="1"
             maxlength="20"
@@ -605,7 +617,7 @@
           <input
             type="text"
             id="aisVesselCallsignInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisVesselCallsignInputHelp"
             minlength="1"
             maxlength="7"
@@ -621,7 +633,7 @@
           <input
             type="text"
             id="aisVesselDestinationInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisVesselDestinationInputHelp"
             minlength="1"
             maxlength="20"
@@ -635,14 +647,18 @@
         </div>
         <div class="form-group formVesselType">
           <label for="aisVesselTypeSelect">Vessel Type</label>
-          <select id="aisVesselTypeSelect" class="form-control" required>
+          <select
+            id="aisVesselTypeSelect"
+            class="form-control form-control-sm"
+            required
+          >
             <option value="0">Not available</option>
             <option value="20">Wing in ground (WIG)</option>
             <option value="30">Fishing</option>
             <option value="31">Towing</option>
-            <option value="32"
-              >Towing: length exceeds 200m or breadth exceeds 25m</option
-            >
+            <option value="32">
+              Towing: length exceeds 200m or breadth exceeds 25m
+            </option>
             <option value="33">Dredging or underwater ops</option>
             <option value="34">Diving ops</option>
             <option value="35">Military ops</option>
@@ -671,7 +687,7 @@
           <input
             type="number"
             id="aisVesselLengthInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisVesselLengthInputHelp"
             min="0"
             max="1022"
@@ -691,7 +707,7 @@
           <input
             type="number"
             id="aisVesselBeamInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisVesselBeamInputHelp"
             min="1"
             max="126"
@@ -711,7 +727,7 @@
           <input
             type="number"
             id="aisVesselDraughtInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisVesselDraughtInputHelp"
             min="0"
             max="30"
@@ -731,7 +747,7 @@
           <input
             type="datetime-local"
             id="aisEtaInput"
-            class="form-control"
+            class="form-control form-control-sm"
             aria-describedby="aisEtaInputHelp"
             required
           />
@@ -745,7 +761,7 @@
           >
           <select
             id="aisInterrogatorMsgTypeSelect"
-            class="form-control"
+            class="form-control form-control-sm"
             required
           >
             <option value="1" selected>1: Position Report Class A</option>
@@ -761,16 +777,20 @@
         <button
           id="aisParameterSubmitButton"
           type="submit"
-          class="btn btn-success"
+          class="btn btn-sm btn-success"
         >
           Send
         </button>
-        <button id="aisFormResetButton" type="reset" class="btn btn-danger">
+        <button
+          id="aisFormResetButton"
+          type="reset"
+          class="btn btn-sm btn-danger"
+        >
           Reset
         </button>
         <div id="alertBox" class="alert mt-3" role="alert"></div>
       </form>
-      <footer style="font-weight: lighter !important; font-size: x-small;">
+      <footer style="font-weight: lighter !important; font-size: x-small">
         Copyright 2020, Michael Wolf, Mictronics<br /><a
           href="https://github.com/mictronics/ais-simulator"
           target="_blank"
