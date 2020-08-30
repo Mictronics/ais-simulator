@@ -47,7 +47,8 @@ documentation: |-
   messages and published on the output port. Each PDU message includes meta data with
   a length key and length of the string as value.
 
-  PDU "send" port is a dummy input for now.
+  PDU message on "send" port are transformed into strings and send to a client connected
+  via websocket server.
 
   Leave listen address blank to bind to all interfaces (equivalent to 0.0.0.0).
 

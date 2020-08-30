@@ -40,7 +40,7 @@ namespace gr
 {
     namespace ais_simulator
     {
-
+        class listener;
         class websocket_pdu_impl : public websocket_pdu
         {
         private:
@@ -51,6 +51,7 @@ namespace gr
             const pmt::pmt_t d_send_port;
             gr::thread::thread d_thread;
             bool d_started;
+            std::shared_ptr<gr::ais_simulator::listener> d_listener = nullptr;
             // The io_context is required for all I/O
             net::io_context d_ioc{1};
             void ioc_run() { d_ioc.run(); };
@@ -71,6 +72,7 @@ namespace gr
             websocket::stream<beast::tcp_stream> d_ws;
             beast::flat_buffer d_buffer;
             websocket_pdu_impl *d_wsi;
+            std::vector<std::shared_ptr<std::string const>> d_queue;
 
         public:
             explicit session(tcp::socket &&socket, websocket_pdu_impl *wsi) : d_ws(std::move(socket)), d_wsi{wsi} {}
@@ -79,6 +81,7 @@ namespace gr
             void on_run();
             void on_accept(beast::error_code ec);
             void read();
+            void write(std::string s);
             void on_read(beast::error_code ec, std::size_t bytes_transferred);
             void on_write(beast::error_code ec, std::size_t bytes_transferred);
         };
@@ -96,6 +99,7 @@ namespace gr
         public:
             listener(net::io_context &ioc, tcp::endpoint endpoint, websocket_pdu_impl *wsi);
             void run();
+            void send(std::string s);
         };
 
     } // namespace ais_simulator

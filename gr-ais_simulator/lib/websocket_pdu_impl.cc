@@ -129,6 +129,30 @@ namespace gr
         }
 
         /*
+         * Write string async to websocket.
+         */
+        void session::write(std::string s)
+        {
+            //  Always add to queue.
+            d_queue.push_back(std::make_shared<std::string const>(s));
+
+            // Are we already writing?
+            if (d_queue.size() > 1)
+            {
+                return;
+            }
+            // Currently not writing, so send immediately.
+            d_ws.text(d_ws.got_text());
+            d_ws.async_write(
+                net::buffer(*d_queue.front()),
+                net::bind_executor(
+                    d_ws.get_executor(),
+                    beast::bind_front_handler(
+                        &session::on_write,
+                        shared_from_this())));
+        }
+
+        /*
          * Asynchronous write handler.
          */
         void session::on_write(beast::error_code ec, std::size_t bytes_transferred)
@@ -139,14 +163,25 @@ namespace gr
             {
                 std::cerr << "write: " << ec.message() << "\n";
             }
-
-            // Clear the buffer
-            d_buffer.consume(d_buffer.size());
-
-            // Do another read
-            read();
+            // Remove sent string from queue.
+            d_queue.erase(d_queue.begin());
+            // Send next string if any.
+            if (!d_queue.empty())
+            {
+                d_ws.text(d_ws.got_text());
+                d_ws.async_write(
+                    net::buffer(*d_queue.front()),
+                    net::bind_executor(
+                        d_ws.get_executor(),
+                        beast::bind_front_handler(
+                            &session::on_write,
+                            this)));
+            }
         }
 
+        /*
+         * Listener class contructor.
+         */
         listener::listener(net::io_context &ioc, tcp::endpoint endpoint, websocket_pdu_impl *wsi) : d_ioc(ioc), d_acceptor(ioc), d_wsi{wsi}
         {
             beast::error_code ec;
@@ -190,6 +225,17 @@ namespace gr
         void listener::run()
         {
             accept();
+        }
+
+        /*
+         * Send string to client session.
+         */
+        void listener::send(std::string s)
+        {
+            if (d_session != nullptr)
+            { // Needs a connection/session to send stuff
+                d_session->write(s);
+            }
         }
 
         /*
@@ -274,7 +320,8 @@ namespace gr
             }
 
             // Create and launch a listening port
-            std::make_shared<listener>(d_ioc, tcp_ep, this)->run();
+            d_listener = std::make_shared<listener>(d_ioc, tcp_ep, this);
+            d_listener->run();
             // Run the I/O service on thread
             d_thread = gr::thread::thread(boost::bind(&websocket_pdu_impl::ioc_run, this));
             d_started = true;
@@ -335,6 +382,17 @@ namespace gr
          */
         void websocket_pdu_impl::ws_send_msg(pmt::pmt_t msg)
         {
+            // Handle only symbol(string) messages so far.
+            if (msg->is_symbol())
+            {
+                // Dispatch work into I/O context thread.
+                net::dispatch(
+                    d_ioc.get_executor(),
+                    beast::bind_front_handler(
+                        &listener::send,
+                        d_listener->shared_from_this(),
+                        pmt::symbol_to_string(msg)));
+            }
         }
 
     } /* namespace ais_simulator */
