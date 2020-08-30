@@ -245,11 +245,15 @@ namespace gr
             : gr::block("websocket_pdu",
                         gr::io_signature::make(0, 0, 0),
                         gr::io_signature::make(0, 0, 0)),
-              d_out_port(pmt::mp("out"))
+              d_out_port(pmt::mp("out")),
+              d_in_port(pmt::mp("in")),
+              d_send_port(pmt::mp("send"))
         {
-            message_port_register_in(pmt::mp("in"));
+            message_port_register_in(d_in_port);
+            message_port_register_in(d_send_port);
             message_port_register_out(d_out_port);
-            set_msg_handler(pmt::mp("in"), [this](pmt::pmt_t msg) { this->set_msg(msg); });
+            set_msg_handler(d_in_port, [this](pmt::pmt_t msg) { this->set_msg(msg); });
+            set_msg_handler(d_send_port, [this](pmt::pmt_t msg) { this->ws_send_msg(msg); });
 
             const unsigned short port_ = static_cast<unsigned short>(std::atoi(port.c_str()));
             tcp::endpoint tcp_ep;
@@ -324,6 +328,13 @@ namespace gr
             d_msg = pmt::cons(d, v);
             // Send message
             message_port_pub(d_out_port, d_msg);
+        }
+
+        /*
+         * Send PDU message via websocket.
+         */
+        void websocket_pdu_impl::ws_send_msg(pmt::pmt_t msg)
+        {
         }
 
     } /* namespace ais_simulator */

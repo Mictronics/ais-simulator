@@ -47,6 +47,8 @@ namespace gr
             std::vector<uint8_t> d_msg_buffer;
             pmt::pmt_t d_msg;
             const pmt::pmt_t d_out_port;
+            const pmt::pmt_t d_in_port;
+            const pmt::pmt_t d_send_port;
             gr::thread::thread d_thread;
             bool d_started;
             // The io_context is required for all I/O
@@ -59,6 +61,7 @@ namespace gr
             void set_msg(pmt::pmt_t msg);
             pmt::pmt_t msg() const { return d_msg; }
             void set_string_msg(std::string s, std::size_t l);
+            void ws_send_msg(pmt::pmt_t msg);
             bool stop();
         };
 

@@ -31,6 +31,9 @@ inputs:
   - domain: message
     id: in
     optional: true
+  - domain: message
+    id: send
+    optional: true
 
 outputs:
   - domain: message
@@ -43,6 +46,8 @@ documentation: |-
   Strings send via websocket message or via PDU input port are transformed into PDU
   messages and published on the output port. Each PDU message includes meta data with
   a length key and length of the string as value.
+
+  PDU "send" port is a dummy input for now.
 
   Leave listen address blank to bind to all interfaces (equivalent to 0.0.0.0).
 
