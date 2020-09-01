@@ -90,6 +90,8 @@ namespace aisSimulator {
                     document.documentElement.setAttribute("data-msg", "none");
                     break;
                 case "1":
+                case "27":
+                    // Content in 1 and 27 is same, only encoding differs
                     document.documentElement.setAttribute("data-msg", "msgType1");
                     break;
                 case "4":

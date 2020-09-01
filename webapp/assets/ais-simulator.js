@@ -66,6 +66,7 @@ var aisSimulator;
                     document.documentElement.setAttribute("data-msg", "none");
                     break;
                 case "1":
+                case "27":
                     document.documentElement.setAttribute("data-msg", "msgType1");
                     break;
                 case "4":

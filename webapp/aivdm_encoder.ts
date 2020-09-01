@@ -49,6 +49,8 @@ namespace aisSimulator {
                     return this.encodeMsgType23(ap.srcMmsi, ap.neLat, ap.neLon, ap.swLat, ap.swLon, ap.interval, ap.quiet);
                 case 24:
                     return this.encodeMsgType24(ap.srcMmsi, ap.msgType24, ap.name, ap.callsign, ap.length, ap.beam, ap.type);
+                case 27:
+                    return this.encodeMsgType27(ap.srcMmsi, ap.status, ap.speed, ap.course, ap.posLat, ap.posLon);
                 default:
                     return "";
             }
@@ -165,6 +167,9 @@ namespace aisSimulator {
             console.assert(s.length === 168);
             s = this.encodeMsgType24(ap.srcMmsi, eMessageType24.TypeB, "01234567890123456789", "0123456789", ap.length, ap.beam, ap.type);
             console.assert(s.length === 168);
+
+            s = this.encodeMsgType27(ap.srcMmsi, ap.status, ap.speed, ap.course, ap.posLat, ap.posLon);
+            console.assert(s.length === 96);
         }
 
         private static charset = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&'()*+,-./0123456789:;<=>?";
@@ -652,6 +657,40 @@ namespace aisSimulator {
             // 00: Spare
 
             return header + part + bVtype + bVendorId + bCallsign + padding + bSize + bFlags;
+        }
+
+        /**
+         * Long-range broadcast message
+         * by mobile station
+         * @param mmsi MMSI
+         * @param status Navigation status
+         * @param speed Speed over ground
+         * @param course Course over ground
+         * @param lat Position latitude
+         * @param lon Position longitude
+         */
+        private static encodeMsgType27(mmsi: number, status: number, speed: number, course: number, lat: number, lon: number): string {
+            const header = this.getMsgHeader(1, mmsi, 3);
+            const bStatus = status.toString(2).padStart(4, "0"); //  Navigation status e.g. 0 = Under way using engine, 1 - At anchor, 5 = Moored, 8 = Sailing, 15 = undefined
+            let bSpeed = "111111"; // 63 = speed is not available.
+            if (speed >= 0 && speed < 63.0) {
+                // Speed over ground with 0.1 knot resolution from 0 to 102 knots. A value 1022 indicates 102.2 knots or higher.
+                bSpeed = Math.floor(speed).toString(2).padStart(6, "0");
+            }
+            const bAccuracy = "00";
+            // 0: Accuracy > 10m
+            // 0: RAIM not used
+            const bLatLon = this.convertLatLonShort(lat, lon);
+            let bCourse = "111111111"; // 511(0x1FF) = course is not available.
+            if (course >= 0 && course < 360) {
+                // Course with 0.1° resolution
+                bCourse = Math.floor(course).toString(2).padStart(9, "0");
+            }
+            const bFlags = "00";
+            // 0: Position latency <5s
+            // 0: Spare
+
+            return header + bAccuracy + bStatus + bLatLon[1] + bLatLon[0] + bSpeed + bCourse + bFlags;
         }
 
     }

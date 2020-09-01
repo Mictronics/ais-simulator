@@ -32,6 +32,8 @@ var aisSimulator;
                     return this.encodeMsgType23(ap.srcMmsi, ap.neLat, ap.neLon, ap.swLat, ap.swLon, ap.interval, ap.quiet);
                 case 24:
                     return this.encodeMsgType24(ap.srcMmsi, ap.msgType24, ap.name, ap.callsign, ap.length, ap.beam, ap.type);
+                case 27:
+                    return this.encodeMsgType27(ap.srcMmsi, ap.status, ap.speed, ap.course, ap.posLat, ap.posLon);
                 default:
                     return "";
             }
@@ -125,6 +127,8 @@ var aisSimulator;
             console.assert(s.length === 168);
             s = this.encodeMsgType24(ap.srcMmsi, aisSimulator.eMessageType24.TypeB, "01234567890123456789", "0123456789", ap.length, ap.beam, ap.type);
             console.assert(s.length === 168);
+            s = this.encodeMsgType27(ap.srcMmsi, ap.status, ap.speed, ap.course, ap.posLat, ap.posLon);
+            console.assert(s.length === 96);
         }
         static encodeString(s) {
             let enc = "";
@@ -385,6 +389,22 @@ var aisSimulator;
             const bSize = this.convertVesselSize(vLength, vBeam);
             const bFlags = "111100";
             return header + part + bVtype + bVendorId + bCallsign + padding + bSize + bFlags;
+        }
+        static encodeMsgType27(mmsi, status, speed, course, lat, lon) {
+            const header = this.getMsgHeader(1, mmsi, 3);
+            const bStatus = status.toString(2).padStart(4, "0");
+            let bSpeed = "111111";
+            if (speed >= 0 && speed < 63.0) {
+                bSpeed = Math.floor(speed).toString(2).padStart(6, "0");
+            }
+            const bAccuracy = "00";
+            const bLatLon = this.convertLatLonShort(lat, lon);
+            let bCourse = "111111111";
+            if (course >= 0 && course < 360) {
+                bCourse = Math.floor(course).toString(2).padStart(9, "0");
+            }
+            const bFlags = "00";
+            return header + bAccuracy + bStatus + bLatLon[1] + bLatLon[0] + bSpeed + bCourse + bFlags;
         }
     }
     AivdmEncoder.charset = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&'()*+,-./0123456789:;<=>?";
