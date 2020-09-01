@@ -174,7 +174,7 @@ var aisSimulator;
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0");
             const bFlags = "000000";
-            const bRadioStatus = "0000000000000000000";
+            const bRadioStatus = "1100000000000000110";
             return header + bStatus + bRot + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bFlags + bRadioStatus;
         }
         static encodeMsgType4(mmsi, lat, lon) {
@@ -188,14 +188,14 @@ var aisSimulator;
             const bSec = now.getSeconds().toString(2).padStart(6, "0");
             const bAccuracy = "0";
             const bLatLon = this.convertLatLon(lat, lon);
-            const bDevice = "0001";
+            const bDevice = "1111";
             const bFlags = "00000000000";
-            const bRadioStatus = "0000000000000000000";
+            const bRadioStatus = "1100000000000000110";
             return header + bYear + bMonth + bDay + bHour + bMin + bSec + bAccuracy + bLatLon[1] + bLatLon[0] + bDevice + bFlags + bRadioStatus;
         }
         static encodeMsgType5(mmsi, vCallsign, vName, vType, vLength, vBeam, eta, draught, vDestination) {
             const header = this.getMsgHeader(5, mmsi, 3);
-            const bAisVer = "00";
+            const bAisVer = "10";
             const bImo = "000000000000000000000000000000";
             let n = vName.substr(0, 20);
             const bName = this.encodeString(n);
@@ -210,12 +210,12 @@ var aisSimulator;
             const bHour = eta.getUTCHours().toString(2).padStart(5, "0");
             const bMin = eta.getUTCMinutes().toString(2).padStart(6, "0");
             const bEta = bMonth + bDay + bHour + bMin;
-            const bFix = "0001";
+            const bFix = "1111";
             const bDraught = draught.toString(2).padStart(8, "0");
             n = vDestination.substr(0, 20);
             const bDestination = this.encodeString(n);
             const padDestination = "".padStart(120 - bDestination.length, "0");
-            const bDTE = "10";
+            const bDTE = "00";
             return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + bSize + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
         }
         static encodeMsgType9(mmsi, altitude, speed, course, lat, lon) {
@@ -233,8 +233,8 @@ var aisSimulator;
             }
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0");
-            const bFlags = "00000000100010";
-            const bRadioStatus = "00000000000000000000";
+            const bFlags = "000000000000001";
+            const bRadioStatus = "1100000000000000110";
             return header + bAlt + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTimestamp + bFlags + bRadioStatus;
         }
         static encodeMsgType12(sourceMmsi, destMmsi, msg) {
@@ -255,7 +255,8 @@ var aisSimulator;
             const header = this.getMsgHeader(15, sourceMmsi, 3);
             const bDestMmsi = destMmsi.toString(2).padStart(30, "0");
             const bMsgType = msgType.toString(2).padStart(6, "0");
-            return header + "00" + bDestMmsi + bMsgType + "000000000000";
+            const bSlotOffset = "000000000000";
+            return header + "00" + bDestMmsi + bMsgType + bSlotOffset;
         }
         static encodeMsgType18(mmsi, speed, course, lat, lon) {
             const header = this.getMsgHeader(18, mmsi, 3);
@@ -273,8 +274,8 @@ var aisSimulator;
             const bTrueHeading = "111111111";
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0");
-            const bFlags = "001011100";
-            const bRadioStatus = "11100000000000000110";
+            const bFlags = "0011000001";
+            const bRadioStatus = "1100000000000000110";
             return header + bReserved + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bFlags + bRadioStatus;
         }
         static encodeMsgType19(mmsi, speed, course, lat, lon, vName, vType, vLength, vBeam) {
@@ -298,7 +299,7 @@ var aisSimulator;
             bName += "".padStart(120 - bName.length, "0");
             const bVtype = vType.toString(2).padStart(8, "0");
             const bSize = this.convertVesselSize(vLength, vBeam);
-            const bFlags = "00010100000";
+            const bFlags = "11110100000";
             return header + bReserved1 + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bReserved2 + bName + bVtype + bSize + bFlags;
         }
         static encodeMsgType20(mmsi, offset, slot, timeout, increment) {
@@ -336,10 +337,12 @@ var aisSimulator;
                 bSize = this.convertVesselSize(vLength, vBeam);
                 bVirtual = "0";
             }
-            const bFix = "0001";
+            const bFix = "1111";
             const now = new Date();
             const bTime = now.getUTCSeconds().toString(2).padStart(6, "0");
-            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + bSize + bFix + bTime + "1000000000" + bVirtual + "00" + bNameExt;
+            const bFlags1 = "0000000000";
+            const bFlags2 = "00";
+            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + bSize + bFix + bTime + bFlags1 + bVirtual + bFlags2 + bNameExt;
         }
         static encodeMsgType22(mmsi, channelA, channelB, neLat, neLon, swLat, swLon) {
             const header = this.getMsgHeader(22, mmsi, 3);
@@ -380,7 +383,8 @@ var aisSimulator;
             const bCallsign = this.encodeString(n);
             padding = "".padEnd(42 - bCallsign.length, "0");
             const bSize = this.convertVesselSize(vLength, vBeam);
-            return header + part + bVtype + bVendorId + bCallsign + padding + bSize + "000000";
+            const bFlags = "111100";
+            return header + part + bVtype + bVendorId + bCallsign + padding + bSize + bFlags;
         }
     }
     AivdmEncoder.charset = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&'()*+,-./0123456789:;<=>?";

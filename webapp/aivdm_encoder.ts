@@ -258,8 +258,10 @@ namespace aisSimulator {
             const bTrueHeading = "111111111"; // 511 = not applicable
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0"); // Seconds of UTC timestamp
-            const bFlags = "000000"; // 00 = Maneuver, 000 = spare, 0 = RAIM flag
-            const bRadioStatus = "0000000000000000000"; // Radio status?
+            const bFlags = "000000"; // 00: Maneuver
+            // 000: spare
+            // 0: RAIM flag
+            const bRadioStatus = "1100000000000000110"; // Communication status, see ITU-R M1371-5 §4.2.2.5
 
             return header + bStatus + bRot + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bFlags + bRadioStatus;
         }
@@ -282,9 +284,9 @@ namespace aisSimulator {
             const bSec = now.getSeconds().toString(2).padStart(6, "0");
             const bAccuracy = "0"; // Accuracy > 10m
             const bLatLon = this.convertLatLon(lat, lon);
-            const bDevice = "0001"; // GPS
+            const bDevice = "1111"; // internal GNSS
             const bFlags = "00000000000"; // Spare + RAIM flag
-            const bRadioStatus = "0000000000000000000"; // Radio status?
+            const bRadioStatus = "1100000000000000110"; // Communication status, see ITU-R M1371-5 §4.2.2.5
             return header + bYear + bMonth + bDay + bHour + bMin + bSec + bAccuracy + bLatLon[1] + bLatLon[0] + bDevice + bFlags + bRadioStatus;
         }
 
@@ -302,7 +304,7 @@ namespace aisSimulator {
          */
         private static encodeMsgType5(mmsi: number, vCallsign: string, vName: string, vType: number, vLength: number, vBeam: number, eta: Date, draught: number, vDestination: string): string {
             const header = this.getMsgHeader(5, mmsi, 3);
-            const bAisVer = "00"; // AIS version ITU1371
+            const bAisVer = "10"; // AIS version ITU M1371-5
             const bImo = "000000000000000000000000000000"; // IMO ID all zero for inland vessel
             let n = vName.substr(0, 20);
             const bName = this.encodeString(n);
@@ -318,12 +320,12 @@ namespace aisSimulator {
             const bHour = eta.getUTCHours().toString(2).padStart(5, "0");
             const bMin = eta.getUTCMinutes().toString(2).padStart(6, "0");
             const bEta = bMonth + bDay + bHour + bMin;
-            const bFix = "0001"; // GPS
+            const bFix = "1111"; // GPS
             const bDraught = draught.toString(2).padStart(8, "0"); // Draught in 1/10m
             n = vDestination.substr(0, 20);
             const bDestination = this.encodeString(n);
             const padDestination = "".padStart(120 - bDestination.length, "0");
-            const bDTE = "10";
+            const bDTE = "00";
 
             return header + bAisVer + bImo + bCallsign + padCallsign + bName + padName + bVtype + bSize + bFix + bEta + bDraught + bDestination + padDestination + bDTE;
         }
@@ -355,8 +357,14 @@ namespace aisSimulator {
             }
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0"); // Seconds of UTC timestamp
-            const bFlags = "00000000100010"; // Reserved, DTE not ready, spare, assigned, RAIM
-            const bRadioStatus = "00000000000000000000"; // Radio status?
+            const bFlags = "000000000000001";// 0: Altitude sensor GNSS
+            // 0000000: Reserved,
+            // 0: DTE ready
+            // 000: spare
+            // 0: Assigned mode = autonomous station
+            // 0: RAIM not used
+            // 1: ITDMA comm state follows, see ITU-R M1371-5 §4.2.2.5
+            const bRadioStatus = "1100000000000000110"; // Communication status, see ITU-R M1371-5 §4.2.2.5
 
             return header + bAlt + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTimestamp + bFlags + bRadioStatus;
         }
@@ -391,12 +399,18 @@ namespace aisSimulator {
             return header + bSpare + bMsg;
         }
 
+        /**
+         * Interrogation via TDMA for single message type reply
+         * @param sourceMmsi MMSI
+         * @param destMmsi Destination MMSI for interrogation
+         * @param msgType Requested message type
+         */
         private static encodeMsgType15(sourceMmsi: number, destMmsi: number, msgType: number): string {
             const header = this.getMsgHeader(15, sourceMmsi, 3);
             const bDestMmsi = destMmsi.toString(2).padStart(30, "0");
             const bMsgType = msgType.toString(2).padStart(6, "0");
-
-            return header + "00" + bDestMmsi + bMsgType + "000000000000";
+            const bSlotOffset = "000000000000"; // Autonomous slot allocation by responding station.
+            return header + "00" + bDestMmsi + bMsgType + bSlotOffset;
         }
 
         /**
@@ -426,16 +440,17 @@ namespace aisSimulator {
             const bTrueHeading = "111111111"; // 511 = not applicable
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0"); // Seconds of UTC timestamp
-            const bFlags = "001011100";
+            const bFlags = "0011000001";
             // 00: Regional reserved
             // 1: CS mode(carrier sense Class B)
-            // 0: Display flag
-            // 1: DSC
-            // 1: Band Flag
-            // 1: M22 Flag
-            // 0: Assigned 0 -> Autonomous mode
+            // 0: Display flag, display available for message 12 and 14
+            // 0: DSC, not equipped with DSC function
+            // 0: Band Flag, irrelevant when M22 flag is 0
+            // 0: M22 Flag, no frequency management via message 22
+            // 0: Autonomous and continuous mode
             // 0: Raim flag
-            const bRadioStatus = "11100000000000000110";
+            // 1: ITDMA comm state follows, see ITU-R M1371-5 §4.2.2.5
+            const bRadioStatus = "1100000000000000110"; // Communication status, see ITU-R M1371-5 §4.2.2.5
             return header + bReserved + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bFlags + bRadioStatus;
         }
 
@@ -476,7 +491,12 @@ namespace aisSimulator {
             const bVtype = vType.toString(2).padStart(8, "0"); // Vessel type
             // AIS antenna in the middle
             const bSize = this.convertVesselSize(vLength, vBeam);
-            const bFlags = "00010100000";
+            const bFlags = "11110100000";
+            // 1111: Internal GNSS
+            // 0: RAIM not in use
+            // 1: DTE available
+            // 0: Station operating in autonomous and continuous mode
+            // 0000: Not used
             return header + bReserved1 + bSpeed + bAccuracy + bLatLon[1] + bLatLon[0] + bCourse + bTrueHeading + bTimestamp + bReserved2 + bName + bVtype + bSize + bFlags;
         }
 
@@ -538,11 +558,17 @@ namespace aisSimulator {
                 bSize = this.convertVesselSize(vLength, vBeam);
                 bVirtual = "0";
             }
-            const bFix = "0001"; // GPS
+            const bFix = "1111"; // Internal GNSS
             const now = new Date();
             const bTime = now.getUTCSeconds().toString(2).padStart(6, "0");
-
-            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + bSize + bFix + bTime + "1000000000" + bVirtual + "00" + bNameExt;
+            const bFlags1 = "0000000000";
+            // 0: AtoN on position
+            // 00000000: Reserved
+            // 0 RAIM not in use
+            const bFlags2 = "00";
+            // 0: Station operating in autonomous and continuous mode
+            // 0: Spare
+            return header + bNavaidType + bName + bAccuracy + bLatLon[1] + bLatLon[0] + bSize + bFix + bTime + bFlags1 + bVirtual + bFlags2 + bNameExt;
         }
 
         /**
@@ -621,8 +647,11 @@ namespace aisSimulator {
             padding = "".padEnd(42 - bCallsign.length, "0"); // Max 7 six-bit characters
             // AIS antenna in the middle
             const bSize = this.convertVesselSize(vLength, vBeam);
+            const bFlags = "111100";
+            // 1111: Internal GNSS
+            // 00: Spare
 
-            return header + part + bVtype + bVendorId + bCallsign + padding + bSize + "000000";
+            return header + part + bVtype + bVendorId + bCallsign + padding + bSize + bFlags;
         }
 
     }
