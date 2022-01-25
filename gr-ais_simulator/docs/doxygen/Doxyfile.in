@@ -199,13 +199,6 @@ TAB_SIZE               = 8
 
 ALIASES                =
 
-# This tag can be used to specify a number of word-keyword mappings (TCL only).
-# A mapping has the form "name=value". For example adding
-# "class=itcl::class" will allow you to use the command class in the
-# itcl::class meaning.
-
-TCL_SUBST              =
-
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C
 # sources only. Doxygen will then generate output that is more tailored for C.
 # For instance, some of the names that are used will be different. The list
@@ -790,7 +783,7 @@ INPUT_FILTER           =
 # info on how filters are used. If FILTER_PATTERNS is empty or if
 # non of the patterns match the file name, INPUT_FILTER is applied.
 
-FILTER_PATTERNS        = *.py="@top_srcdir@"/doc/doxygen/other/doxypy.py
+FILTER_PATTERNS        = *.py='@top_srcdir@'/doc/doxygen/other/doxypy.py
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will be used to filter the input files when producing source
@@ -878,12 +871,6 @@ VERBATIM_HEADERS       = YES
 # contains a lot of classes, structs, unions or interfaces.
 
 ALPHABETICAL_INDEX     = YES
-
-# If the alphabetical index is enabled (see ALPHABETICAL_INDEX) then
-# the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns
-# in which this list will be split (can be a number in the range [1..20])
-
-COLS_IN_ALPHA_INDEX    = 5
 
 # In case all classes in a project start with a common prefix, all
 # classes will be put under the same header in the alphabetical index.
@@ -1680,11 +1667,6 @@ EXTERNAL_GROUPS        = YES
 
 EXTERNAL_PAGES         = YES
 
-# The PERL_PATH should be the absolute path and name of the perl script
-# interpreter (i.e. the result of `which perl').
-
-PERL_PATH              = /usr/bin/perl
-
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool
 #---------------------------------------------------------------------------
@@ -1697,14 +1679,12 @@ PERL_PATH              = /usr/bin/perl
 
 CLASS_DIAGRAMS         = YES
 
-# You can define message sequence charts within doxygen comments using the \msc
-# command. Doxygen will then run the mscgen tool (see
-# http://www.mcternan.me.uk/mscgen/) to produce the chart and insert it in the
-# documentation. The MSCGEN_PATH tag allows you to specify the directory where
-# the mscgen tool resides. If left empty the tool is assumed to be found in the
-# default search path.
+# You can include diagrams made with dia in doxygen documentation. Doxygen will
+# then run dia to produce the diagram and insert it in the documentation. The
+# DIA_PATH tag allows you to specify the directory where the dia binary resides.
+# If left empty dia is assumed to be found in the default search path.
 
-MSCGEN_PATH            =
+DIA_PATH               =
 
 # If set to YES, the inheritance and collaboration graphs will hide
 # inheritance and usage relations if the target is undocumented
