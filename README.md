@@ -9,11 +9,13 @@ The web application let you select and compose various AIS message and performs 
 
 Tested in the following environment:
 
-- GnuRadio 3.8.2
+- GnuRadio 3.8.2 & 3.8.5
 - gr-osmosdr 0.2.0
 - Ubuntu 20.04 focal
-- Python 3.8
+- Debian 11 bullseye
+- Python 3.8 & 3.9.2
 - GNU C++ version 9.3.0; Boost 1.71.
+- GNU C++ version 10.2.1; Boost 1.74.
 - HackRF One (2018.01.1)
 
 ## Building
