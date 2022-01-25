@@ -279,7 +279,7 @@ namespace gr
             }
             else
             {
-                while (ascii != 1)
+                while (ascii != 1 && y < 6)
                 {
                     if (ascii % 2 == 0)
                     {
@@ -294,7 +294,7 @@ namespace gr
                 }
             }
 
-            if (ascii == 1)
+            if (ascii == 1 && y < 6)
             {
                 binary[y] = 0x1;
                 y++;
