@@ -24,6 +24,8 @@ $ make
 $ sudo make install
 ```
 
+On Debian 11 bullseye or other system with python 3.9 replace `3.8` with `3.9`.
+
 In case of `ImportError: No module named ais_simulator` set LD_LIBRARY_PATH:
 
 ```
@@ -34,7 +36,7 @@ sudo ldconfig
 
 #### License
 
-Copyright 2020, Mictronics
+Copyright 2022, Mictronics
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

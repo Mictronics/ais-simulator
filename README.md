@@ -40,6 +40,25 @@ sudo apt-get install -y \
     libosmocore-dev
 ```
 
+Debian 11 bullseye:
+
+```
+sudo apt-get install -y \
+    cmake \
+    autoconf \
+    libtool \
+    pkg-config \
+    build-essential \
+    python3-docutils \
+    libcppunit-dev \
+    swig \
+    doxygen \
+    python3-scipy \
+    gnuradio-dev \
+    gr-osmosdr \
+    libosmocore-dev
+```
+
 ### Build & Installation
 
 See [README](gr-ais_simulator/README.md) on how to build and install the custom GnuRadio block.
