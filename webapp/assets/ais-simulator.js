@@ -38,6 +38,8 @@ var aisSimulator;
                 const btn = document.getElementById("aisParameterSubmitButton");
                 btn.disabled = false;
                 clearTimeout(reconnectTimeout);
+                reconnectTries = 5;
+                reconnectTime = 5000;
             };
             ws.onerror = (ev) => {
                 console.error("WebSocket error:", ev);

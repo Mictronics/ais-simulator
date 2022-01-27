@@ -59,6 +59,8 @@ namespace aisSimulator {
                 const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
                 btn.disabled = false;
                 clearTimeout(reconnectTimeout);
+                reconnectTries = 5;
+                reconnectTime = 5000;
             };
 
             ws.onerror = (ev: Event) => {
