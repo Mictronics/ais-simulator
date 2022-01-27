@@ -33,51 +33,87 @@ namespace aisSimulator {
         let msgType24: eMessageType24 = eMessageType24.Unknown;
         let navAidSimType: eAtoN = eAtoN.Real;
         let selectedMsgType: number = 0;
+        let reconnectTimeout: number = null;
+        let reconnectTries: number = 5;
+        let reconnectTime: number = 5000;
+        let ws: WebSocket = null;
 
-        const ws = new WebSocket("ws://localhost:52002/ws");
-        ws.onmessage = (evt: MessageEvent) => {
-            console.info(evt.data);
-        };
+        /**
+         * Connect to AIS websocket PDU.
+         */
+        function websocketConnect() {
+            ws = new WebSocket("ws://localhost:52002/ws");
+            ws.onmessage = (evt: MessageEvent) => {
+                console.info(evt.data);
+            };
 
-        ws.onopen = (ev: Event) => {
-            new Noty({
-                layout: "centerRight",
-                progressBar: false,
-                text: "Connected!",
-                theme: "bootstrap-v4",
-                timeout: 500,
-                type: "success",
-            }).show();
-            const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
-            btn.disabled = false;
-        };
+            ws.onopen = (ev: Event) => {
+                new Noty({
+                    layout: "centerRight",
+                    progressBar: false,
+                    text: "Connected!",
+                    theme: "bootstrap-v4",
+                    timeout: 500,
+                    type: "success",
+                }).show();
+                const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
+                btn.disabled = false;
+                clearTimeout(reconnectTimeout);
+            };
 
-        ws.onerror = (ev: Event) => {
-            console.error("WebSocket error:", ev);
-            new Noty({
-                layout: "centerRight",
-                progressBar: false,
-                text: "Websocket error!",
-                theme: "bootstrap-v4",
-                timeout: 3500,
-                type: "error",
-            }).show();
-            const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
-            btn.disabled = true;
-        };
+            ws.onerror = (ev: Event) => {
+                console.error("WebSocket error:", ev);
+                new Noty({
+                    layout: "centerRight",
+                    progressBar: false,
+                    text: "Websocket error!",
+                    theme: "bootstrap-v4",
+                    timeout: 3500,
+                    type: "error",
+                }).show();
+                const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
+                btn.disabled = true;
+                if (reconnectTries <= 0) {
+                    clearTimeout(reconnectTimeout);
+                    new Noty({
+                        layout: "centerRight",
+                        progressBar: false,
+                        text: "Tried reconnection 5 times. Giving up...",
+                        theme: "bootstrap-v4",
+                        timeout: 5000,
+                        type: "error",
+                    }).show();
+                    new Noty({
+                        layout: "centerRight",
+                        progressBar: false,
+                        text: "Reload page for reconnection.",
+                        theme: "bootstrap-v4",
+                        timeout: false,
+                        type: "error",
+                    }).show();
+                }
+            };
 
-        ws.onclose = () => {
-            new Noty({
-                layout: "centerRight",
-                progressBar: false,
-                text: "Websocket closed!",
-                theme: "bootstrap-v4",
-                timeout: 5000,
-                type: "warning",
-            }).show();
-            const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
-            btn.disabled = true;
+            ws.onclose = () => {
+                new Noty({
+                    layout: "centerRight",
+                    progressBar: false,
+                    text: `Websocket closed! Reconnecting in ${reconnectTime / 1000} seconds.`,
+                    theme: "bootstrap-v4",
+                    timeout: 5000,
+                    type: "warning",
+                }).show();
+                const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
+                btn.disabled = true;
+                if (reconnectTries > 0) {
+                    reconnectTimeout = setTimeout(websocketConnect, reconnectTime);
+                    reconnectTime += 5000;
+                    reconnectTries -= 1;
+                }
+            }
         }
+
+        websocketConnect();
 
         /**
          * Provide form field depending on selected message type.
