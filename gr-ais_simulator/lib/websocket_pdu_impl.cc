@@ -23,7 +23,7 @@
 #endif
 
 #include <gnuradio/io_signature.h>
-#include <gnuradio/blocks/pdu.h>
+#include <gnuradio/pdu.h>
 #include "websocket_pdu_impl.h"
 
 namespace gr

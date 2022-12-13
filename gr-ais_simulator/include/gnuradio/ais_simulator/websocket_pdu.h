@@ -21,7 +21,7 @@
 #ifndef INCLUDED_AIS_SIMULATOR_WEBSOCKET_PDU_H
 #define INCLUDED_AIS_SIMULATOR_WEBSOCKET_PDU_H
 
-#include <ais_simulator/api.h>
+#include <gnuradio/ais_simulator/api.h>
 #include <gnuradio/block.h>
 
 namespace gr
@@ -37,7 +37,7 @@ namespace gr
         class AIS_SIMULATOR_API websocket_pdu : virtual public gr::block
         {
         public:
-            typedef boost::shared_ptr<websocket_pdu> sptr;
+            typedef std::shared_ptr<websocket_pdu> sptr;
 
             /*!
              * \brief Return a shared_ptr to a new instance of ais_simulator::websocket_pdu.

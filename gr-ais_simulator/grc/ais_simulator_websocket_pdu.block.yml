@@ -3,7 +3,7 @@ label: Websocket PDU
 category: '[AIS Simulator]'
 
 templates:
-  imports: import ais_simulator
+  imports: import gnuradio.ais_simulator as ais_simulator
   make: ais_simulator.websocket_pdu(${addr}, ${port})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.

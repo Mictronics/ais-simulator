@@ -1,7 +1,8 @@
 options:
   parameters:
     author: Mictronics
-    category: Custom
+    catch_exceptions: 'True'
+    category: '[AIS Simulator]'
     cmake_opt: ''
     comment: ''
     copyright: ''
@@ -41,7 +42,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 4.0]
+    coordinate: [432, 8.0]
     rotation: 0
     state: enabled
 - name: samp_rate
@@ -53,7 +54,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [208, 4.0]
+    coordinate: [288, 8.0]
     rotation: 0
     state: enabled
 - name: sentence
@@ -65,7 +66,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [392, 4.0]
+    coordinate: [544, 8.0]
     rotation: 0
     state: enabled
 - name: ais_simulator_build_frame_1
@@ -84,7 +85,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [368, 124.0]
+    coordinate: [360, 224.0]
     rotation: 0
     state: true
 - name: blocks_multiply_const_xx_0
@@ -102,44 +103,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 148.0]
-    rotation: 0
-    state: enabled
-- name: blocks_pdu_to_tagged_stream_0
-  id: blocks_pdu_to_tagged_stream
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    tag: packet_len
-    type: byte
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [160, 148.0]
-    rotation: 0
-    state: enabled
-- name: blocks_socket_pdu_0
-  id: blocks_socket_pdu
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    host: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    mtu: '1024'
-    port: '1337'
-    tcp_no_delay: 'False'
-    type: TCP_SERVER
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [16, 124.0]
+    coordinate: [744, 224.0]
     rotation: 0
     state: enabled
 - name: digital_gmsk_mod_0
@@ -149,6 +113,7 @@ blocks:
     alias: ''
     bt: '0.4'
     comment: ''
+    do_unpack: 'True'
     log: 'False'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -161,6 +126,26 @@ blocks:
     coordinate: [584, 140.0]
     rotation: 0
     state: enabled
+- name: network_socket_pdu_0
+  id: network_socket_pdu
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    host: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    mtu: '10000'
+    port: '1337'
+    tcp_no_delay: 'False'
+    type: TCP_SERVER
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [48, 236.0]
+    rotation: 0
+    state: true
 - name: osmosdr_sink_0
   id: osmosdr_sink
   parameters:
@@ -419,16 +404,34 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [920, 68.0]
+    coordinate: [1000, 72.0]
+    rotation: 0
+    state: true
+- name: pdu_pdu_to_tagged_stream_0
+  id: pdu_pdu_to_tagged_stream
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    tag: packet_len
+    type: byte
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [384, 368.0]
     rotation: 0
     state: true
 
 connections:
 - [ais_simulator_build_frame_1, '0', digital_gmsk_mod_0, '0']
 - [blocks_multiply_const_xx_0, '0', osmosdr_sink_0, '0']
-- [blocks_pdu_to_tagged_stream_0, '0', ais_simulator_build_frame_1, '0']
-- [blocks_socket_pdu_0, pdus, blocks_pdu_to_tagged_stream_0, pdus]
 - [digital_gmsk_mod_0, '0', blocks_multiply_const_xx_0, '0']
+- [network_socket_pdu_0, pdus, pdu_pdu_to_tagged_stream_0, pdus]
+- [pdu_pdu_to_tagged_stream_0, '0', ais_simulator_build_frame_1, '0']
 
 metadata:
   file_format: 1
+  grc_version: v3.11.0.0git-352-g6efdc9d8

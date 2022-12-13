@@ -28,7 +28,7 @@
 #include <thread>
 #include <vector>
 
-#include <ais_simulator/websocket_pdu.h>
+#include <gnuradio/ais_simulator/websocket_pdu.h>
 
 namespace beast = boost::beast;         // From <boost/beast.hpp>
 namespace http = beast::http;           // From <boost/beast/http.hpp>
