@@ -21,7 +21,7 @@
 #ifndef INCLUDED_AIS_SIMULATOR_BITSTRING_TO_FRAME_H
 #define INCLUDED_AIS_SIMULATOR_BITSTRING_TO_FRAME_H
 
-#include <ais_simulator/api.h>
+#include <gnuradio/ais_simulator/api.h>
 #include <gnuradio/tagged_stream_block.h>
 
 namespace gr {
@@ -35,7 +35,7 @@ namespace gr {
     class AIS_SIMULATOR_API bitstring_to_frame : virtual public gr::tagged_stream_block
     {
      public:
-      typedef boost::shared_ptr<bitstring_to_frame> sptr;
+      typedef std::shared_ptr<bitstring_to_frame> sptr;
 
       /*!
        * \brief Return a shared_ptr to a new instance of ais_simulator::bitstring_to_frame.

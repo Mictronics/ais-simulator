@@ -21,7 +21,7 @@
 #ifndef INCLUDED_AIS_SIMULATOR_BITSTRING_TO_FRAME_IMPL_H
 #define INCLUDED_AIS_SIMULATOR_BITSTRING_TO_FRAME_IMPL_H
 
-#include <ais_simulator/bitstring_to_frame.h>
+#include <gnuradio/ais_simulator/bitstring_to_frame.h>
 
 namespace gr
 {
