@@ -3,3 +3,4 @@ gr-ais_simulator/build/**
 ais-simulator.code-workspace
 .flake8
 top_block.py
+**/__pycache__/
