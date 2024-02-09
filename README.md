@@ -9,13 +9,11 @@ The web application let you select and compose various AIS message and performs 
 
 Tested in the following environment:
 
-- GnuRadio 3.8.2 & 3.8.5
+- GnuRadio 3.10.1.1
 - gr-osmosdr 0.2.0
-- Ubuntu 20.04 focal
-- Debian 11 bullseye
-- Python 3.8 & 3.9.2
-- GNU C++ version 9.3.0; Boost 1.71.
-- GNU C++ version 10.2.1; Boost 1.74.
+- Ubuntu 22.04 jammy
+- Python 3.10.12
+- GNU C++ version 11.4; Boost 1.74.
 - HackRF One (2018.01.1)
 
 ## Building
@@ -78,7 +76,7 @@ class A AIS transponder via over the air transmission.
 
 #### License
 
-Copyright 2020, Mictronics
+Copyright 2020-2024, Mictronics
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

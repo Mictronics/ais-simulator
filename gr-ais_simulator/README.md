@@ -19,12 +19,10 @@ https://github.com/gercap/ais
 ```
 $ mkdir build
 $ cd build
-$ cmake ../ -Wno-dev -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3.8 -DPYTHON_INCLUDE_DIR:PATH=/usr/include/python3.8 -DPYTHON_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpython3.8.so
+$ cmake ../ -Wno-dev -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3.10 -DPYTHON_INCLUDE_DIR:PATH=/usr/include/python3.10 -DPYTHON_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpython3.10.so
 $ make
 $ sudo make install
 ```
-
-On Debian 11 bullseye or other system with python 3.9 replace `3.8` with `3.9`.
 
 In case of `ImportError: No module named ais_simulator` set LD_LIBRARY_PATH:
 
@@ -36,7 +34,7 @@ sudo ldconfig
 
 #### License
 
-Copyright 2022, Mictronics
+Copyright 2022-2024, Mictronics
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
