@@ -71,8 +71,8 @@ Note: gr-ais_simulator blocks need to rebuild and installed after GnuRadio toolc
 2. Open ./webapp/ais-simulator.html in browser.
 3. Select AIS message type, modify parameters and send message...
 
-Tested against [rtl_ais](https://github.com/dgiardini/rtl-ais) and Comar Systems CSA300
-class A AIS transponder via over the air transmission.
+Tested against [rtl_ais](https://github.com/dgiardini/rtl-ais), Comar Systems CSA300
+and Saab R5A class A AIS transponder via over the air transmission.
 
 #### License
 
