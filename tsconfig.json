@@ -5,10 +5,8 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
-    "locale": "us",
     "module": "ES6",
     "alwaysStrict": true,
-    "watch": true,
     "outDir": "./webapp/assets/"
   },
   "compileOnSave": true,
