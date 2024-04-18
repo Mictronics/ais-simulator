@@ -670,7 +670,7 @@ namespace aisSimulator {
          * @param lon Position longitude
          */
         private static encodeMsgType27(mmsi: number, status: number, speed: number, course: number, lat: number, lon: number): string {
-            const header = this.getMsgHeader(1, mmsi, 3);
+            const header = this.getMsgHeader(27, mmsi, 3);
             const bStatus = status.toString(2).padStart(4, "0"); //  Navigation status e.g. 0 = Under way using engine, 1 - At anchor, 5 = Moored, 8 = Sailing, 15 = undefined
             let bSpeed = "111111"; // 63 = speed is not available.
             if (speed >= 0 && speed < 63.0) {

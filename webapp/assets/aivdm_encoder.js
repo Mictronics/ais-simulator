@@ -391,7 +391,7 @@ var aisSimulator;
             return header + part + bVtype + bVendorId + bCallsign + padding + bSize + bFlags;
         }
         static encodeMsgType27(mmsi, status, speed, course, lat, lon) {
-            const header = this.getMsgHeader(1, mmsi, 3);
+            const header = this.getMsgHeader(27, mmsi, 3);
             const bStatus = status.toString(2).padStart(4, "0");
             let bSpeed = "111111";
             if (speed >= 0 && speed < 63.0) {
