@@ -30,6 +30,13 @@
 #define LEN_CRC 16
 #define LEN_FRAME_MAX 256
 
+// stuff() inserts one extra "0" bit after every five consecutive 1-bits, so
+// the worst case (an all-ones input) adds floor(len / 5) bits to the length.
+static inline int stuffed_worst_case_len(int len)
+{
+    return len + (len / 5);
+}
+
 namespace gr
 {
     namespace ais_simulator
@@ -380,7 +387,15 @@ namespace gr
 
         int bitstring_to_frame_impl::calculate_output_stream_length(const gr_vector_int &ninput_items)
         {
-            return 32; // Need some math here?!
+            // ninput_items[0] upper-bounds the sentence length set_sentence() will
+            // actually use (it may trim further at the first '\n'/'\0'), so it also
+            // upper-bounds the worst-case stuffed frame length for this call.
+            int frame_bits = LEN_PREAMBLE + LEN_START + stuffed_worst_case_len(ninput_items[0] + LEN_CRC) + LEN_START;
+            if (frame_bits < LEN_FRAME_MAX)
+            {
+                frame_bits = LEN_FRAME_MAX; // frames are padded to a full radio slot
+            }
+            return (frame_bits + 7) / 8; // round up to whole bytes
         }
 
         int bitstring_to_frame_impl::work(int noutput_items,
@@ -411,13 +426,24 @@ namespace gr
             unsigned char *byte_frame;
             if (d_len_payload <= 168)
             {
+                // Worst-case bit-stuffing overhead can push a <=168-bit payload's
+                // stuffed length past what fits in a fixed 256-bit (LEN_FRAME_MAX)
+                // frame alongside preamble/start/trailer, so size the frame dynamically
+                // instead of assuming it always fits (used to overflow `frame` below).
                 char stuffed_payload[LEN_FRAME_MAX];
                 int len_stuffed_payload = stuff(d_payload, stuffed_payload, d_len_payload + LEN_CRC);
 
                 //// frame generation /////
-                frame = (char *)malloc(LEN_FRAME_MAX);
-                byte_frame = (unsigned char *)malloc(LEN_FRAME_MAX / 8);
-                memset(frame, 0x0, LEN_FRAME_MAX);
+                int len_frame = LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START;
+                if (len_frame < LEN_FRAME_MAX)
+                {
+                    len_frame = LEN_FRAME_MAX; // pad short frames to fill a full radio slot
+                }
+                len_frame = (len_frame + 7) & ~7; // stuffing can produce a non-multiple-of-8 length
+
+                frame = (char *)malloc(len_frame);
+                byte_frame = (unsigned char *)malloc(len_frame / 8);
+                memset(frame, 0x0, len_frame);
 
                 // headers
                 memcpy(frame, preamble, LEN_PREAMBLE);
@@ -428,9 +454,9 @@ namespace gr
                 memcpy(frame + LEN_PREAMBLE + LEN_START + len_stuffed_payload, start_mark, 8);
 
                 // padding
-                int len_padding = LEN_FRAME_MAX - (LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START);
+                int len_padding = len_frame - (LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START);
                 memset(frame + LEN_PREAMBLE + LEN_START + len_stuffed_payload + LEN_START, 0x0, len_padding);
-                int len_frame_real = LEN_FRAME_MAX; // 256
+                int len_frame_real = len_frame;
 
                 // NRZI Conversion
                 nrz_to_nrzi(frame, len_frame_real);
@@ -443,11 +469,16 @@ namespace gr
 
                 // output
                 memcpy(out, byte_frame, len_frame_real / 8);
-                noutput_items = len_frame_real;
+                noutput_items = len_frame_real / 8; // item size is 1 byte; work() must return a byte count
             }
             else
             {
-                char *stuffed_payload = (char *)malloc(LEN_PREAMBLE + LEN_START + d_len_payload + LEN_CRC);
+                // Size for the worst-case (all-ones) bit-stuffing overhead; the previous
+                // fixed LEN_PREAMBLE+LEN_START margin was too small once d_len_payload
+                // grew large enough that stuffing overhead exceeded it, overflowing this
+                // buffer in stuff().
+                int stuffed_capacity = stuffed_worst_case_len(d_len_payload + LEN_CRC);
+                char *stuffed_payload = (char *)malloc(stuffed_capacity);
                 int len_stuffed_payload = stuff(d_payload, stuffed_payload, d_len_payload + LEN_CRC);
 
                 //// frame generation /////
@@ -481,7 +512,7 @@ namespace gr
 
                 // output
                 memcpy(out, byte_frame, len_frame_real / 8);
-                noutput_items = len_frame_real;
+                noutput_items = len_frame_real / 8; // item size is 1 byte; work() must return a byte count
                 free((char *)stuffed_payload);
             }
 
