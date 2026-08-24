@@ -151,8 +151,6 @@ if __name__ == '__main__':
         parser.error("Invalid IP address!")
 
     channel_ID = 0 if options.channel == "A" else 1
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
 
     tb = top_block(
         c=channel_ID,
@@ -163,5 +161,12 @@ if __name__ == '__main__':
         ppm=options.ppm,
         ip=options.addr,
         port=options.port)
+
+    # Only register once tb exists, otherwise a Ctrl-C during top_block()
+    # construction (e.g. while osmosdr enumerates devices) hits
+    # NameError: name 'tb' is not defined instead of a clean shutdown.
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     tb.start()
     tb.wait()
