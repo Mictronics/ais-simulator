@@ -267,6 +267,43 @@ namespace aisSimulator {
         }
 
         /**
+         * Parse a numeric form field, validate its range, and mark it invalid on failure.
+         * @param el Form element to validate.
+         * @param parser Number parser, e.g. parseFloat or (v) => parseInt(v, 10).
+         * @param min Minimum allowed value (inclusive).
+         * @param max Maximum allowed value (inclusive).
+         * @returns The parsed value, or null if out of range.
+         */
+        function validateNumericField(
+            el: HTMLInputElement | HTMLSelectElement,
+            parser: (value: string) => number,
+            min: number,
+            max: number,
+        ): number | null {
+            const value = parser(el.value);
+            if (value < min || value > max) {
+                el.classList.replace("is-valid", "is-invalid");
+                return null;
+            }
+            return value;
+        }
+
+        /**
+         * Validate a string form field's length and mark it invalid on failure.
+         * @param el Form element to validate.
+         * @param minLength Minimum allowed length (inclusive).
+         * @param maxLength Maximum allowed length (inclusive).
+         * @returns The field value, or null if out of range.
+         */
+        function validateStringField(el: HTMLInputElement, minLength: number, maxLength: number): string | null {
+            if (el.value.length < minLength || el.value.length > maxLength) {
+                el.classList.replace("is-valid", "is-invalid");
+                return null;
+            }
+            return el.value;
+        }
+
+        /**
          * Validate and process parameter form values.
          * @param el List with parameter form elements.
          */
@@ -328,86 +365,54 @@ namespace aisSimulator {
             }
             aisParameters.msgType = selectedMsgType;
 
-            if (form.aisSartMsgInput.value.length < 1 || form.aisSartMsgInput.value.length > 161) {
-                form.aisSartMsgInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
-            aisParameters.sartMsg = form.aisSartMsgInput.value;
+            const asInt = (v: string) => parseInt(v, 10);
 
-            if (form.aisAddrMsgInput.value.length < 1 || form.aisAddrMsgInput.value.length > 156) {
-                form.aisAddrMsgInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
-            aisParameters.addrMsg = form.aisAddrMsgInput.value;
+            let str = validateStringField(form.aisSartMsgInput, 1, 161);
+            if (str === null) { return; }
+            aisParameters.sartMsg = str;
 
-            let num = parseFloat(form.aisLatInput.value);
-            if (num < -90.0 || num > 90.0) {
-                form.aisLatInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            str = validateStringField(form.aisAddrMsgInput, 1, 156);
+            if (str === null) { return; }
+            aisParameters.addrMsg = str;
+
+            let num = validateNumericField(form.aisLatInput, parseFloat, -90.0, 90.0);
+            if (num === null) { return; }
             aisParameters.posLat = num;
 
-            num = parseFloat(form.aisLonInput.value);
-            if (num < -180.0 || num > 180.0) {
-                form.aisLonInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisLonInput, parseFloat, -180.0, 180.0);
+            if (num === null) { return; }
             aisParameters.posLon = num;
 
-            num = parseInt(form.aisAltitudeInput.value, 10);
-            if (num < 0 || num > 4095) {
-                form.aisAltitudeInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisAltitudeInput, asInt, 0, 4095);
+            if (num === null) { return; }
             aisParameters.altitude = num;
 
-            num = parseFloat(form.aisSpeedInput.value);
-            if (num < -1 || num > 100.0) {
-                form.aisSpeedInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisSpeedInput, parseFloat, -1, 100.0);
+            if (num === null) { return; }
             aisParameters.speed = num;
 
-            num = parseFloat(form.aisCourseInput.value);
-            if (num < -1 || num > 360.0) {
-                form.aisCourseInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisCourseInput, parseFloat, -1, 360.0);
+            if (num === null) { return; }
             aisParameters.course = num;
 
-            num = parseInt(form.aisNavStatusSelect.value, 10);
-            if (num < 0 || num > 15) {
-                form.aisNavStatusSelect.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisNavStatusSelect, asInt, 0, 15);
+            if (num === null) { return; }
             aisParameters.status = num;
 
-            num = parseInt(form.aisFatdmaOffsetInput.value, 10);
-            if (num < 0 || num > 4095) {
-                form.aisFatdmaOffsetInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisFatdmaOffsetInput, asInt, 0, 4095);
+            if (num === null) { return; }
             aisParameters.fatdmaOffset = num;
 
-            num = parseInt(form.aisFatdmaSlotsInput.value, 10);
-            if (num < 0 || num > 15) {
-                form.aisFatdmaSlotsInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisFatdmaSlotsInput, asInt, 0, 15);
+            if (num === null) { return; }
             aisParameters.fatdmaSlot = num;
 
-            num = parseInt(form.aisFatdmaTimeoutInput.value, 10);
-            if (num < 0 || num > 7) {
-                form.aisFatdmaTimeoutInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisFatdmaTimeoutInput, asInt, 0, 7);
+            if (num === null) { return; }
             aisParameters.fatdmaTimeout = num;
 
-            num = parseInt(form.aisFatdmaRepeatInput.value, 10);
-            if (num < 0 || num > 2047) {
-                form.aisFatdmaRepeatInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisFatdmaRepeatInput, asInt, 0, 2047);
+            if (num === null) { return; }
             aisParameters.fatdmaRepeat = num;
 
             if (form.aisRealAtoNRadio.checked && navAidSimType === eAtoN.Real) {
@@ -418,73 +423,44 @@ namespace aisSimulator {
                 aisParameters.navAidSimType = eAtoN.Unknown;
             }
 
-            num = parseInt(form.aisAtoNTypeSelect.value, 10);
-            if (num < 0 || num > 31) {
-                form.aisAtoNTypeSelect.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisAtoNTypeSelect, asInt, 0, 31);
+            if (num === null) { return; }
             aisParameters.navAidType = num;
 
-            if (form.aisAtoNNameInput.value.length < 1 || form.aisAtoNNameInput.value.length > 20) {
-                form.aisAtoNNameInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
-            aisParameters.navAidName = form.aisAtoNNameInput.value;
+            str = validateStringField(form.aisAtoNNameInput, 1, 20);
+            if (str === null) { return; }
+            aisParameters.navAidName = str;
 
-            num = parseInt(form.aisChannelAInput.value, 10);
-            if (num < 0 || num > 9999) {
-                form.aisChannelAInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisChannelAInput, asInt, 0, 9999);
+            if (num === null) { return; }
             aisParameters.channelA = num;
 
-            num = parseInt(form.aisChannelBInput.value, 10);
-            if (num < 0 || num > 9999) {
-                form.aisChannelBInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisChannelBInput, asInt, 0, 9999);
+            if (num === null) { return; }
             aisParameters.channelB = num;
 
-            num = parseFloat(form.aisNELatInput.value);
-            if (num < -90.0 || num > 90.0) {
-                form.aisNELatInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisNELatInput, parseFloat, -90.0, 90.0);
+            if (num === null) { return; }
             aisParameters.neLat = num;
 
-            num = parseFloat(form.aisNELonInput.value);
-            if (num < -180.0 || num > 180.0) {
-                form.aisNELonInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisNELonInput, parseFloat, -180.0, 180.0);
+            if (num === null) { return; }
             aisParameters.neLon = num;
 
-            num = parseFloat(form.aisSWLatInput.value);
-            if (num < -90.0 || num > 90.0) {
-                form.aisSWLatInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisSWLatInput, parseFloat, -90.0, 90.0);
+            if (num === null) { return; }
             aisParameters.swLat = num;
 
-            num = parseFloat(form.aisSWLonInput.value);
-            if (num < -180.0 || num > 180.0) {
-                form.aisSWLonInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisSWLonInput, parseFloat, -180.0, 180.0);
+            if (num === null) { return; }
             aisParameters.swLon = num;
 
-            num = parseInt(form.aisReportingIntervalSelect.value, 10);
-            if (num < 0 || num > 10) {
-                form.aisReportingIntervalSelect.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisReportingIntervalSelect, asInt, 0, 10);
+            if (num === null) { return; }
             aisParameters.interval = num;
 
-            num = parseInt(form.aisQuietTimeInput.value, 10);
-            if (num < 0 || num > 15) {
-                form.aisQuietTimeInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisQuietTimeInput, asInt, 0, 15);
+            if (num === null) { return; }
             aisParameters.quiet = num;
 
             if (form.aisStaticReportTypeARadio.checked && msgType24 === eMessageType24.TypeA) {
@@ -495,43 +471,28 @@ namespace aisSimulator {
                 aisParameters.msgType24 = eMessageType24.Unknown;
             }
 
-            if (form.aisVesselNameInput.value.length < 1 || form.aisVesselNameInput.value.length > 20) {
-                form.aisVesselNameInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
-            aisParameters.name = form.aisVesselNameInput.value;
+            str = validateStringField(form.aisVesselNameInput, 1, 20);
+            if (str === null) { return; }
+            aisParameters.name = str;
 
-            if (form.aisVesselCallsignInput.value.length < 1 || form.aisVesselCallsignInput.value.length > 7) {
-                form.aisVesselCallsignInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
-            aisParameters.callsign = form.aisVesselCallsignInput.value;
+            str = validateStringField(form.aisVesselCallsignInput, 1, 7);
+            if (str === null) { return; }
+            aisParameters.callsign = str;
 
-            if (form.aisVesselDestinationInput.value.length < 1 || form.aisVesselDestinationInput.value.length > 20) {
-                form.aisVesselDestinationInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
-            aisParameters.destination = form.aisVesselDestinationInput.value;
+            str = validateStringField(form.aisVesselDestinationInput, 1, 20);
+            if (str === null) { return; }
+            aisParameters.destination = str;
 
-            num = parseInt(form.aisVesselTypeSelect.value, 10);
-            if (num < 0 || num > 99) {
-                form.aisVesselTypeSelect.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisVesselTypeSelect, asInt, 0, 99);
+            if (num === null) { return; }
             aisParameters.type = num;
 
-            num = parseInt(form.aisVesselLengthInput.value, 10);
-            if (num < 0 || num > 1022) {
-                form.aisVesselLengthInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisVesselLengthInput, asInt, 0, 1022);
+            if (num === null) { return; }
             aisParameters.length = num;
 
-            num = parseInt(form.aisVesselBeamInput.value, 10);
-            if (num < 1 || num > 126) {
-                form.aisVesselBeamInput.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisVesselBeamInput, asInt, 1, 126);
+            if (num === null) { return; }
             aisParameters.beam = num;
 
             num = parseFloat(form.aisVesselDraughtInput.value);
@@ -553,11 +514,8 @@ namespace aisSimulator {
             d.setTime(num);
             aisParameters.eta = d;
 
-            num = parseInt(form.aisInterrogatorMsgTypeSelect.value, 10);
-            if (num < 0 || num > 27) {
-                form.aisInterrogatorMsgTypeSelect.classList.replace("is-valid", "is-invalid");
-                return;
-            }
+            num = validateNumericField(form.aisInterrogatorMsgTypeSelect, asInt, 0, 27);
+            if (num === null) { return; }
             aisParameters.interrogationMsgType = num;
 
             if (ws.readyState === WebSocket.OPEN) {
