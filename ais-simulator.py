@@ -150,6 +150,15 @@ if __name__ == '__main__':
     except ValueError:
         parser.error("Invalid IP address!")
 
+    if options.lna < 0 or options.lna > 47:
+        parser.error("Invalid value: LNA gain must be between 0 and 47 dB!")
+
+    if options.bit_rate < 1:
+        parser.error("Invalid value: Bit rate must be greater than zero!")
+
+    if options.sampling_rate < 2 * options.bit_rate:
+        parser.error("Invalid value: Sampling rate must be at least twice the bit rate!")
+
     channel_ID = 0 if options.channel == "A" else 1
 
     tb = top_block(
