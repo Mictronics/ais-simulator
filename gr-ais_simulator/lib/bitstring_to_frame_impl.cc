@@ -196,6 +196,11 @@ namespace gr
             crc = (crc & 0xFFFF) ^ 0xFFFF;
             int2bin(crc, ret, 16);
             reverse_bit_order(ret, 16); //revert crc bit in byte
+            // The reverse_bit_order() above is intentionally discarded by this second
+            // int2bin() call: set_sentence() later runs reverse_bit_order() once over the
+            // *whole* payload+crc buffer, so crc must still be MSB-first here or that single
+            // outer reversal ends up wrong. Verified against the CRC-16/X.25 magic residual
+            // (0xF0B8) -- do not remove as "dead code", it changes the transmitted CRC.
             int2bin(crc, ret, 16);
             strncpy(temp, ret + 8, 8); //swap the two crc byte
             strncpy(ret + 8, ret, 8);
