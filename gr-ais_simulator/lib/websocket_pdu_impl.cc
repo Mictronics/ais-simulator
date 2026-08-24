@@ -142,7 +142,7 @@ namespace gr
                 return;
             }
             // Currently not writing, so send immediately.
-            d_ws.text(d_ws.got_text());
+            d_ws.text(true); // this server always sends text (JSON/NMEA) frames
             d_ws.async_write(
                 net::buffer(*d_queue.front()),
                 net::bind_executor(
@@ -168,7 +168,7 @@ namespace gr
             // Send next string if any.
             if (!d_queue.empty())
             {
-                d_ws.text(d_ws.got_text());
+                d_ws.text(true); // this server always sends text (JSON/NMEA) frames
                 d_ws.async_write(
                     net::buffer(*d_queue.front()),
                     net::bind_executor(
