@@ -47,9 +47,9 @@ namespace gr
             int stuff(const char *in, char *out, int l_in);
             void nrz_to_nrzi(char *data, int length);
             void reverse_bit_order(char *data, int length);
-            unsigned long unpack(char *buffer, int start, int length);
-            void compute_crc(char *buffer, char *ret, unsigned int len);
-            void byte_packing(char *input_frame, unsigned char *out_byte, unsigned int len);
+            unsigned long unpack(const char *buffer, int start, int length);
+            void compute_crc(const char *buffer, char *ret, unsigned int len);
+            void byte_packing(const char *input_frame, unsigned char *out_byte, unsigned int len);
 
         public:
             bitstring_to_frame_impl(bool enable_nrzi, const std::string &len_tag_key);

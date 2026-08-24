@@ -166,9 +166,9 @@ namespace gr
             //dump_buffer(d_payload, d_len_payload);
 
             char crc[16]; // 2 gnuradio bytes of CRC
-            char *input_crc = (char *)malloc(d_len_payload);
-            memcpy(input_crc, d_payload, d_len_payload);
-            compute_crc(input_crc, crc, d_len_payload);
+            // compute_crc() only reads its input, so pass d_payload straight through
+            // instead of copying it into a throwaway buffer first.
+            compute_crc(d_payload, crc, d_len_payload);
             memcpy(d_payload + d_len_payload, crc, LEN_CRC);
 
             // reverse
@@ -176,18 +176,20 @@ namespace gr
 
             GR_LOG_INFO(d_logger, "Sentence changed!");
             //printf("%d bits, reminder %d\n", len_payload, reminder_to_eight);
-            free((char *)input_crc);
             return true;
         }
 
-        void bitstring_to_frame_impl::compute_crc(char *buffer, char *ret, unsigned int len) // Calculates CRC-checksum from unpacked data
+        void bitstring_to_frame_impl::compute_crc(const char *buffer, char *ret, unsigned int len) // Calculates CRC-checksum from unpacked data
         {
             int crc = 0xffff;
             int i = 0;
             char temp[8];
             int datalen = len / 8;
 
-            char *data = (char *)malloc(datalen);
+            // len is d_len_payload, capped to 4048 (multiple of 8) in set_sentence(),
+            // so datalen never exceeds 4048/8 = 506; a fixed buffer avoids a malloc/free
+            // pair on this per-frame hot path.
+            char data[4048 / 8];
 
             for (int j = 0; j < datalen; j++) //this unpacks the data in preparation for calculating CRC
             {
@@ -198,7 +200,6 @@ namespace gr
             {
                 crc = (crc >> 8) ^ crc_itu16_table[(crc ^ data[i]) & 0xFF];
             }
-            free((char *)data);
 
             crc = (crc & 0xFFFF) ^ 0xFFFF;
             int2bin(crc, ret, 16);
@@ -310,7 +311,7 @@ namespace gr
             }
         }
 
-        unsigned long bitstring_to_frame_impl::unpack(char *buffer, int start, int length)
+        unsigned long bitstring_to_frame_impl::unpack(const char *buffer, int start, int length)
         {
             unsigned long ret = 0;
             for (int i = start; i < (start + length); i++)
@@ -321,13 +322,12 @@ namespace gr
             return ret;
         }
 
-        void bitstring_to_frame_impl::byte_packing(char *input_frame, unsigned char *out_byte, unsigned int len)
+        void bitstring_to_frame_impl::byte_packing(const char *input_frame, unsigned char *out_byte, unsigned int len)
         {
-            for (int i = 0; i < len / 8; i++)
+            for (unsigned int i = 0; i < len / 8; i++)
             {
-                char tmp[8];
-                memcpy(tmp, &input_frame[i * 8], 8);
-                out_byte[i] = tmp[0] * 128 + tmp[1] * 64 + tmp[2] * 32 + tmp[3] * 16 + tmp[4] * 8 + tmp[5] * 4 + tmp[6] * 2 + tmp[7];
+                const char *bits = &input_frame[i * 8];
+                out_byte[i] = bits[0] * 128 + bits[1] * 64 + bits[2] * 32 + bits[3] * 16 + bits[4] * 8 + bits[5] * 4 + bits[6] * 2 + bits[7];
             }
         }
 
@@ -368,8 +368,6 @@ namespace gr
                 return noutput_items;
             }
 
-            char *frame;
-            unsigned char *byte_frame;
             if (d_len_payload <= 168)
             {
                 // Worst-case bit-stuffing overhead can push a <=168-bit payload's
@@ -387,8 +385,16 @@ namespace gr
                 }
                 len_frame = (len_frame + 7) & ~7; // stuffing can produce a non-multiple-of-8 length
 
-                frame = (char *)malloc(len_frame);
-                byte_frame = (unsigned char *)malloc(len_frame / 8);
+                // len_frame's worst case here is LEN_PREAMBLE+LEN_START+220+LEN_START = 260,
+                // rounded up to 264 (with d_len_payload<=168 the stuffed payload+crc, at most
+                // 184 bits, can grow by at most floor(184/5)=36 stuffing bits to 220). A fixed
+                // stack buffer avoids a malloc/free pair per frame on this common hot path,
+                // like `stuffed_payload` above already does.
+                // GCC -O3 emits a -Wstringop-overflow false positive here (it can't prove
+                // len_frame/8 <= 33 through byte_packing()'s inlined loop); verified safe
+                // with an ASan/UBSan sweep of every d_len_payload 1..4048 at -O3.
+                char frame[264];
+                unsigned char byte_frame[264 / 8];
                 memset(frame, 0x0, len_frame);
 
                 // headers
@@ -433,8 +439,8 @@ namespace gr
                 {
                     len_frame++;
                 }
-                frame = (char *)malloc(len_frame);
-                byte_frame = (unsigned char *)malloc(len_frame / 8);
+                char *frame = (char *)malloc(len_frame);
+                unsigned char *byte_frame = (unsigned char *)malloc(len_frame / 8);
                 memset(frame, 0x0, len_frame);
 
                 // headers
@@ -460,10 +466,10 @@ namespace gr
                 memcpy(out, byte_frame, len_frame_real / 8);
                 noutput_items = len_frame_real / 8; // item size is 1 byte; work() must return a byte count
                 free((char *)stuffed_payload);
+                free((unsigned char *)byte_frame);
+                free((char *)frame);
             }
 
-            free((unsigned char *)byte_frame);
-            free((char *)frame);
             // Tell runtime system how many output items we produced.
             return noutput_items;
         }
