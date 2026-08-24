@@ -21,6 +21,7 @@ var aisSimulator;
         let reconnectTries = 5;
         let reconnectTime = 5000;
         let ws = null;
+        const submitButton = document.getElementById("aisParameterSubmitButton");
         function websocketConnect() {
             ws = new WebSocket("ws://localhost:52002/ws");
             ws.onmessage = (evt) => {
@@ -35,8 +36,7 @@ var aisSimulator;
                     timeout: 500,
                     type: "success",
                 }).show();
-                const btn = document.getElementById("aisParameterSubmitButton");
-                btn.disabled = false;
+                submitButton.disabled = false;
                 clearTimeout(reconnectTimeout);
                 reconnectTries = 5;
                 reconnectTime = 5000;
@@ -51,8 +51,7 @@ var aisSimulator;
                     timeout: 3500,
                     type: "error",
                 }).show();
-                const btn = document.getElementById("aisParameterSubmitButton");
-                btn.disabled = true;
+                submitButton.disabled = true;
                 if (reconnectTries <= 0) {
                     clearTimeout(reconnectTimeout);
                     new Noty({
@@ -82,8 +81,7 @@ var aisSimulator;
                     timeout: 5000,
                     type: "warning",
                 }).show();
-                const btn = document.getElementById("aisParameterSubmitButton");
-                btn.disabled = true;
+                submitButton.disabled = true;
                 if (reconnectTries > 0) {
                     reconnectTimeout = setTimeout(websocketConnect, reconnectTime);
                     reconnectTime += 5000;
@@ -445,7 +443,7 @@ var aisSimulator;
             }
             aisParameters.draught = num * 10;
             num = Date.parse(form.aisEtaInput.value);
-            if (num === Number.NaN) {
+            if (Number.isNaN(num)) {
                 form.aisEtaInput.classList.replace("is-valid", "is-invalid");
                 return;
             }

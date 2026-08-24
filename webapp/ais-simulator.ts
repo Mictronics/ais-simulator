@@ -37,6 +37,7 @@ namespace aisSimulator {
         let reconnectTries: number = 5;
         let reconnectTime: number = 5000;
         let ws: WebSocket = null;
+        const submitButton = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
 
         /**
          * Connect to AIS websocket PDU.
@@ -56,8 +57,7 @@ namespace aisSimulator {
                     timeout: 500,
                     type: "success",
                 }).show();
-                const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
-                btn.disabled = false;
+                submitButton.disabled = false;
                 clearTimeout(reconnectTimeout);
                 reconnectTries = 5;
                 reconnectTime = 5000;
@@ -73,8 +73,7 @@ namespace aisSimulator {
                     timeout: 3500,
                     type: "error",
                 }).show();
-                const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
-                btn.disabled = true;
+                submitButton.disabled = true;
                 if (reconnectTries <= 0) {
                     clearTimeout(reconnectTimeout);
                     new Noty({
@@ -105,8 +104,7 @@ namespace aisSimulator {
                     timeout: 5000,
                     type: "warning",
                 }).show();
-                const btn = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
-                btn.disabled = true;
+                submitButton.disabled = true;
                 if (reconnectTries > 0) {
                     reconnectTimeout = setTimeout(websocketConnect, reconnectTime);
                     reconnectTime += 5000;
@@ -547,7 +545,7 @@ namespace aisSimulator {
             aisParameters.draught = num * 10;
 
             num = Date.parse(form.aisEtaInput.value);
-            if (num === Number.NaN) {
+            if (Number.isNaN(num)) {
                 form.aisEtaInput.classList.replace("is-valid", "is-invalid");
                 return;
             }
