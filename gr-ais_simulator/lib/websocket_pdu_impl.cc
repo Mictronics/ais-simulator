@@ -175,7 +175,7 @@ namespace gr
                         d_ws.get_executor(),
                         beast::bind_front_handler(
                             &session::on_write,
-                            this)));
+                            shared_from_this())));
             }
         }
 
