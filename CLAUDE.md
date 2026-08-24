@@ -96,3 +96,16 @@ Touches three places that must stay in sync:
 
 The GNURadio blocks themselves (`bitstring_to_frame`, `websocket_pdu`) are message-type-agnostic —
 they operate on raw bit strings/frames and don't need changes for new AIS message types.
+
+## Verifying changes
+
+- Bit-manipulation logic in `gr-ais_simulator/lib/*.cc` (byte swaps, CRC reversal, NRZI) is easy to
+  misjudge by reading alone — a "redundant" reversal may be cancelling out a later one elsewhere in
+  the pipeline. Verify numerically (e.g. CRC-16/X.25's magic residual 0xF0B8) before treating it as
+  a bug.
+- ASan/UBSan (`g++ -fsanitize=address,undefined`) is effective for checking the C++ blocks' manual
+  malloc/memcpy sizing. GCC `-O3 -Wstringop-overflow` has thrown a false positive on inlined,
+  runtime-bounded loops here — confirm with ASan before trusting the warning.
+- For `/code-review`, prefer per-directory targets (`webapp/`, `gr-ais_simulator/lib`,
+  `ais-simulator.py`) at `medium` effort over `high .` on the whole repo, which has stalled
+  (spawns multiple finder agents; one can hang 600s+).

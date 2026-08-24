@@ -4,3 +4,4 @@ ais-simulator.code-workspace
 .flake8
 top_block.py
 **/__pycache__/
+.claude.local.md
