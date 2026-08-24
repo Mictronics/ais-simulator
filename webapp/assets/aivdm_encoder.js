@@ -160,20 +160,26 @@ var aisSimulator;
             const hw = Math.ceil((beam / 2)).toString(2).padStart(6, "0");
             return hl + hl + hw + hw;
         }
+        static encodeSpeed(speed) {
+            if (speed >= 0 && speed < 102.2) {
+                return Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
+            }
+            return "1111111111";
+        }
+        static encodeCourse(course) {
+            if (course >= 0 && course < 360) {
+                return Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
+            }
+            return "111000010000";
+        }
         static encodeMsgType1(mmsi, status, speed, course, lat, lon) {
             const header = this.getMsgHeader(1, mmsi, 3);
             const bStatus = status.toString(2).padStart(4, "0");
             const bRot = "10000000";
-            let bSpeed = "1111111111";
-            if (speed >= 0 && speed < 102.2) {
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0";
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000";
-            if (course >= 0 && course < 360) {
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const bTrueHeading = "111111111";
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0");
@@ -225,16 +231,10 @@ var aisSimulator;
         static encodeMsgType9(mmsi, altitude, speed, course, lat, lon) {
             const header = this.getMsgHeader(9, mmsi, 3);
             const bAlt = altitude.toString(2).padStart(12, "0");
-            let bSpeed = "1111111111";
-            if (speed >= 0 && speed < 102.2) {
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0";
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000";
-            if (course >= 0 && course < 360) {
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0");
             const bFlags = "000000000000001";
@@ -265,16 +265,10 @@ var aisSimulator;
         static encodeMsgType18(mmsi, speed, course, lat, lon) {
             const header = this.getMsgHeader(18, mmsi, 3);
             const bReserved = "00000000";
-            let bSpeed = "1111111111";
-            if (speed >= 0 && speed < 102.2) {
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0";
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000";
-            if (course >= 0 && course < 360) {
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const bTrueHeading = "111111111";
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0");
@@ -285,16 +279,10 @@ var aisSimulator;
         static encodeMsgType19(mmsi, speed, course, lat, lon, vName, vType, vLength, vBeam) {
             const header = this.getMsgHeader(19, mmsi, 3);
             const bReserved1 = "00000000";
-            let bSpeed = "1111111111";
-            if (speed >= 0 && speed < 102.2) {
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0";
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000";
-            if (course >= 0 && course < 360) {
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const bTrueHeading = "111111111";
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0");

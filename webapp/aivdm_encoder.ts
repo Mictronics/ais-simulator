@@ -235,6 +235,32 @@ namespace aisSimulator {
         }
 
         /**
+         * Encode speed over ground, 0.1 knot resolution, 10 bits.
+         * Used by message types 1, 9, 18 and 19.
+         * @param speed Speed over ground in knots
+         */
+        private static encodeSpeed(speed: number): string {
+            // 1023 = speed is not available. A value 1022 indicates 102.2 knots or higher.
+            if (speed >= 0 && speed < 102.2) {
+                return Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
+            }
+            return "1111111111";
+        }
+
+        /**
+         * Encode course over ground, 0.1° resolution, 12 bits.
+         * Used by message types 1, 9, 18 and 19.
+         * @param course Course over ground in degrees
+         */
+        private static encodeCourse(course: number): string {
+            // 3600(0xE10) = course is not available.
+            if (course >= 0 && course < 360) {
+                return Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
+            }
+            return "111000010000";
+        }
+
+        /**
          * Position Report Class A
          * by mobile station
          * @param mmsi MMSI
@@ -248,18 +274,10 @@ namespace aisSimulator {
             const header = this.getMsgHeader(1, mmsi, 3);
             const bStatus = status.toString(2).padStart(4, "0"); //  Navigation status e.g. 0 = Under way using engine, 1 - At anchor, 5 = Moored, 8 = Sailing, 15 = undefined
             const bRot = "10000000"; // 128, rate of turn not defined
-            let bSpeed = "1111111111"; // 1023 = speed is not available.
-            if (speed >= 0 && speed < 102.2) {
-                // Speed over ground with 0.1 knot resolution from 0 to 102 knots. A value 1022 indicates 102.2 knots or higher.
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0"; // Accuracy > 10m
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000"; // 3600(0xE10) = course is not available.
-            if (course >= 0 && course < 360) {
-                // Course with 0.1° resolution
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const bTrueHeading = "111111111"; // 511 = not applicable
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0"); // Seconds of UTC timestamp
@@ -348,18 +366,10 @@ namespace aisSimulator {
         private static encodeMsgType9(mmsi: number, altitude: number, speed: number, course: number, lat: number, lon: number): string {
             const header = this.getMsgHeader(9, mmsi, 3);
             const bAlt = altitude.toString(2).padStart(12, "0");
-            let bSpeed = "1111111111"; // 1023 = speed is not available.
-            if (speed >= 0 && speed < 102.2) {
-                // Speed over ground with 0.1 knot resolution from 0 to 102 knots. A value 1022 indicates 102.2 knots or higher.
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0"; // Accuracy > 10m
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000"; // 3600(0xE10) = course is not available.
-            if (course >= 0 && course < 360) {
-                // Course with 0.1° resolution
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0"); // Seconds of UTC timestamp
             const bFlags = "000000000000001";// 0: Altitude sensor GNSS
@@ -430,18 +440,10 @@ namespace aisSimulator {
         private static encodeMsgType18(mmsi: number, speed: number, course: number, lat: number, lon: number): string {
             const header = this.getMsgHeader(18, mmsi, 3);
             const bReserved = "00000000";
-            let bSpeed = "1111111111"; // 1023 = speed is not available.
-            if (speed >= 0 && speed < 102.2) {
-                // Speed over ground with 0.1 knot resolution from 0 to 102 knots. A value 1022 indicates 102.2 knots or higher.
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0"; // Accuracy > 10m
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000"; // 3600(0xE10) = course is not available.
-            if (course >= 0 && course < 360) {
-                // Course with 0.1° resolution
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const bTrueHeading = "111111111"; // 511 = not applicable
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0"); // Seconds of UTC timestamp
@@ -475,18 +477,10 @@ namespace aisSimulator {
         private static encodeMsgType19(mmsi: number, speed: number, course: number, lat: number, lon: number, vName: string, vType: number, vLength: number, vBeam: number): string {
             const header = this.getMsgHeader(19, mmsi, 3);
             const bReserved1 = "00000000";
-            let bSpeed = "1111111111"; // 1023 = speed is not available.
-            if (speed >= 0 && speed < 102.2) {
-                // Speed over ground with 0.1 knot resolution from 0 to 102 knots. A value 1022 indicates 102.2 knots or higher.
-                bSpeed = Math.floor(Math.round(speed * 10)).toString(2).padStart(10, "0");
-            }
+            const bSpeed = this.encodeSpeed(speed);
             const bAccuracy = "0"; // Accuracy > 10m
             const bLatLon = this.convertLatLon(lat, lon);
-            let bCourse = "111000010000"; // 3600(0xE10) = course is not available.
-            if (course >= 0 && course < 360) {
-                // Course with 0.1° resolution
-                bCourse = Math.floor(Math.round(course * 10)).toString(2).padStart(12, "0");
-            }
+            const bCourse = this.encodeCourse(course);
             const bTrueHeading = "111111111"; // 511 = not applicable
             const now = new Date();
             const bTimestamp = now.getUTCSeconds().toString(2).padStart(6, "0"); // Seconds of UTC timestamp
