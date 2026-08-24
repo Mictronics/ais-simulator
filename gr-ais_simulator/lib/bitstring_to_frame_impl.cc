@@ -273,60 +273,6 @@ namespace gr
             return l_out;
         }
 
-        void bitstring_to_frame_impl::pack(int orig_ascii, char *ret, int bits_per_byte)
-        {
-            // go down to fit in 6 bits
-            int ascii = orig_ascii - 48;
-            if (ascii > 39)
-            {
-                ascii -= 8;
-            }
-
-            char binary[6];
-            int y = 0;
-
-            if (ascii == 0)
-            {
-                memset(binary, 0x0, 6);
-            }
-            else
-            {
-                while (ascii != 1 && y < 6)
-                {
-                    if (ascii % 2 == 0)
-                    {
-                        binary[y] = 0x0;
-                    }
-                    else if (ascii % 2 == 1)
-                    {
-                        binary[y] = 0x1;
-                    }
-                    ascii /= 2;
-                    y++;
-                }
-            }
-
-            if (ascii == 1 && y < 6)
-            {
-                binary[y] = 0x1;
-                y++;
-            }
-
-            if (y < 6)
-            { // fill in space
-                for (; y < 6; y++)
-                {
-                    binary[y] = 0x0;
-                }
-            }
-
-            for (y = 0; y < 6; y++) // reverse*/
-            {
-                ret[y] = binary[5 - y];
-            }
-            ret[y] = '\0';
-        }
-
         void bitstring_to_frame_impl::nrz_to_nrzi(char *data, int length)
         {
             unsigned short d_prev_nrzi_bit = 0;

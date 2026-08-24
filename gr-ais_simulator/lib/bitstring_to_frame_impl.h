@@ -32,7 +32,6 @@ namespace gr
         {
         private:
             bool d_enable_nrzi;
-            const char *d_sentence;
             char *d_payload;
             unsigned short d_len_payload;
             std::vector<tag_t> d_tags;
@@ -46,7 +45,6 @@ namespace gr
             void dump_buffer(const char *b, int buffer_size);
             char *int2bin(int a, char *buffer, int buf_size);
             int stuff(const char *in, char *out, int l_in);
-            void pack(int orig_ascii, char *ret, int bits_per_byte);
             void nrz_to_nrzi(char *data, int length);
             void reverse_bit_order(char *data, int length);
             unsigned long unpack(char *buffer, int start, int length);
