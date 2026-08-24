@@ -44,7 +44,6 @@ namespace gr
         class websocket_pdu_impl : public websocket_pdu
         {
         private:
-            std::vector<uint8_t> d_msg_buffer;
             pmt::pmt_t d_msg;
             const pmt::pmt_t d_out_port;
             const pmt::pmt_t d_in_port;

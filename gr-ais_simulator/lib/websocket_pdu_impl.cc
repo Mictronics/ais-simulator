@@ -368,10 +368,8 @@ namespace gr
          */
         void websocket_pdu_impl::set_string_msg(std::string s, std::size_t l)
         {
-            d_msg_buffer.resize(l);
-            memcpy(&d_msg_buffer[0], s.c_str(), l);
             // Store sentence as vector data
-            pmt::pmt_t v = pmt::init_u8vector(l, (const uint8_t *)&d_msg_buffer[0]);
+            pmt::pmt_t v = pmt::init_u8vector(l, (const uint8_t *)s.data());
             // Store length of sentence in message meta data
             // This propagated via tag in tagged stream.
             pmt::pmt_t d = pmt::make_dict();
