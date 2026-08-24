@@ -265,17 +265,7 @@ namespace aisSimulator {
          * @param mmsi MMSI as string.
          */
         function verifyMmsi(mmsi: string): boolean {
-            if (mmsi.length !== 9) {
-                return false;
-            }
-
-            for (const c of mmsi) {
-                if (Number.isNaN(c)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return /^[0-9]{9}$/.test(mmsi);
         }
 
         /**

@@ -199,15 +199,7 @@ var aisSimulator;
         });
         document.getElementById("aisEtaInput").value = (new Date(Date.now())).toISOString().slice(0, 16);
         function verifyMmsi(mmsi) {
-            if (mmsi.length !== 9) {
-                return false;
-            }
-            for (const c of mmsi) {
-                if (Number.isNaN(c)) {
-                    return false;
-                }
-            }
-            return true;
+            return /^[0-9]{9}$/.test(mmsi);
         }
         function validateForm(form) {
             const aisParameters = {
