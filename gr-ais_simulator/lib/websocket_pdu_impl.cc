@@ -354,8 +354,13 @@ namespace gr
          */
         void websocket_pdu_impl::set_msg(pmt::pmt_t msg)
         {
-            std::string s = pmt::symbol_to_string(msg);
-            set_string_msg(s, s.length());
+            // Handle only symbol(string) messages, like ws_send_msg() does; anything
+            // else would make symbol_to_string() throw on the message-handler thread.
+            if (msg->is_symbol())
+            {
+                std::string s = pmt::symbol_to_string(msg);
+                set_string_msg(s, s.length());
+            }
         }
 
         /*
