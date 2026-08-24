@@ -282,11 +282,11 @@ namespace aisSimulator {
             const header = this.getMsgHeader(4, mmsi, 3);
             const now = new Date();
             const bYear = now.getUTCFullYear().toString(2).padStart(14, "0");
-            const bMonth = now.getUTCMonth().toString(2).padStart(4, "0");
-            const bDay = now.getUTCDay().toString(2).padStart(5, "0");
-            const bHour = now.getHours().toString(2).padStart(5, "0");
-            const bMin = now.getMinutes().toString(2).padStart(6, "0");
-            const bSec = now.getSeconds().toString(2).padStart(6, "0");
+            const bMonth = (now.getUTCMonth() + 1).toString(2).padStart(4, "0");
+            const bDay = now.getUTCDate().toString(2).padStart(5, "0");
+            const bHour = now.getUTCHours().toString(2).padStart(5, "0");
+            const bMin = now.getUTCMinutes().toString(2).padStart(6, "0");
+            const bSec = now.getUTCSeconds().toString(2).padStart(6, "0");
             const bAccuracy = "0"; // Accuracy > 10m
             const bLatLon = this.convertLatLon(lat, lon);
             const bDevice = "1111"; // internal GNSS
@@ -543,11 +543,11 @@ namespace aisSimulator {
             let bNameExt = "";
             let bName = "";
             if (navaidName.length <= 20) {
-                bName = this.encodeString(navaidName).padStart(120, "0");
+                bName = this.encodeString(navaidName).padEnd(120, "0");
             } else {
                 const n = navaidName.replace("@", "");
                 if (n.length <= 20) {
-                    bName = this.encodeString(n).padStart(120, "0");
+                    bName = this.encodeString(n).padEnd(120, "0");
                 } else {
                     bName = this.encodeString(n.substr(0, 20)); // First 20 characters
                     bNameExt = this.encodeString(n.substr(20, 14)); // No more than 14 characters in ext name
