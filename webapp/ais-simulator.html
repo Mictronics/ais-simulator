@@ -11,10 +11,13 @@
     />
     <link rel="stylesheet" href="./assets/bootstrap.min.css" />
     <link rel="stylesheet" href="./assets/styles.css" />
-    <link rel="stylesheet" href="./assets/noty.css" />
-    <link rel="stylesheet" href="./assets/bootstrap-v4.css" />
   </head>
   <body>
+    <div
+      id="toastContainer"
+      class="toast-container position-fixed top-0 end-0 p-3"
+      style="z-index: 11"
+    ></div>
     <div class="container-sm">
       <h1>AIS Message Simulator</h1>
       <form id="aisParameterForm" class="aisParameterForm" novalidate>
@@ -801,7 +804,7 @@
         Released under GPL v3.
       </footer>
     </div>
-    <script type="text/javascript" src="./assets/noty.min.js"></script>
+    <script type="text/javascript" src="./assets/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="./assets/aivdm_encoder.js"></script>
     <script type="text/javascript" src="./assets/ais-simulator.js"></script>
   </body>
