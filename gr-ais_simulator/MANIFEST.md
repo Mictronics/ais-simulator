@@ -6,11 +6,11 @@ tags:
 - ais
 - hackrf
   author:
-- Author Name Michael Wolf <michael@mictronics.de>
+- Michael Wolf <michael@mictronics.de>
   copyright_owner:
-- Copyright 2020, Michael Wolf
+- Copyright 2020-2024, Michael Wolf
   license: GPL v3
-  gr_supported_version: 3.8.1
+  gr_supported_version: 3.10.1.1
   repo: https://github.com/Mictronics/ais-simulator
 
 ---

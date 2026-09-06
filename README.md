@@ -22,6 +22,8 @@ Tested in the following environment:
 
 You need to install the following build dependencies first:
 
+Ubuntu 20.04 focal and earlier (Python 2 based toolchain):
+
 ```
 sudo apt-get install -y \
     cmake \
@@ -40,7 +42,8 @@ sudo apt-get install -y \
     libosmocore-dev
 ```
 
-Debian 11 bullseye:
+Debian 11 bullseye / Ubuntu 22.04 jammy (Python 3 based toolchain, matches the
+tested environment above):
 
 ```
 sudo apt-get install -y \
@@ -65,6 +68,16 @@ See [README](gr-ais_simulator/README.md) on how to build and install the custom 
 
 Note: gr-ais_simulator blocks need to rebuild and installed after GnuRadio toolchain update.
 
+### Web application
+
+The web UI is written in TypeScript and compiled to `webapp/assets/`, which is checked into the
+repository. If you edit any file under `webapp/*.ts`, rebuild the compiled output before testing
+in a browser:
+
+```
+npm run build
+```
+
 ## How to run
 
 1. Start AIS simulator `$ python3 -u ais-simulator.py`
@@ -73,6 +86,21 @@ Note: gr-ais_simulator blocks need to rebuild and installed after GnuRadio toolc
 
 Tested against [rtl_ais](https://github.com/dgiardini/rtl-ais), Comar Systems CSA300
 and Saab R5A class A AIS transponder via over the air transmission.
+
+### Command line options
+
+Run `python3 ais-simulator.py --help` for the full list. The most commonly used options:
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `--channel {A,B}` | AIS channel: A = 161.975MHz (87B), B = 162.025MHz (88B) | `A` |
+| `--addr` | Websocket server listen address | `0.0.0.0` |
+| `--port` | Websocket server listen port | `52002` |
+| `--sampling_rate` | Sampling rate, must be at least 2x the bit rate | `8000000` |
+| `--bit_rate` | Bit rate in Baud | `9600` |
+| `-a` | Enable RF amp | disabled |
+| `-l GAIN` | IF (LNA) gain, 0-47 dB | `10` |
+| `-p PPM` | Frequency correction in ppm | `0` |
 
 #### License
 

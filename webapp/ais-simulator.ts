@@ -38,6 +38,56 @@ namespace aisSimulator {
         let reconnectTime: number = 5000;
         let ws: WebSocket = null;
         const submitButton = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
+        const toastContainer = document.getElementById("toastContainer") as HTMLDivElement;
+
+        type ToastType = "success" | "warning" | "error";
+
+        const toastLabel: Record<ToastType, string> = {
+            success: "Success",
+            warning: "Warning",
+            error: "Error",
+        };
+
+        const toastIconClass: Record<ToastType, string> = {
+            success: "text-success",
+            warning: "text-warning",
+            error: "text-danger",
+        };
+
+        /**
+         * Show a Bootstrap toast notification, top-right, stacked.
+         */
+        function showToast(text: string, type: ToastType, timeout: number | false): void {
+            const toastEl = document.createElement("div");
+            toastEl.className = "toast";
+            toastEl.setAttribute("role", "alert");
+            toastEl.setAttribute("aria-live", "assertive");
+            toastEl.setAttribute("aria-atomic", "true");
+            if (timeout === false) {
+                toastEl.dataset.bsAutohide = "false";
+            } else {
+                toastEl.dataset.bsDelay = String(timeout);
+            }
+
+            const header = document.createElement("div");
+            header.className = "toast-header";
+            header.innerHTML = `<span class="${toastIconClass[type]} me-2">●</span><strong class="me-auto">${toastLabel[type]}</strong>`;
+            const closeButton = document.createElement("button");
+            closeButton.type = "button";
+            closeButton.className = "btn-close";
+            closeButton.setAttribute("data-bs-dismiss", "toast");
+            closeButton.setAttribute("aria-label", "Close");
+            header.appendChild(closeButton);
+
+            const body = document.createElement("div");
+            body.className = "toast-body";
+            body.textContent = text;
+
+            toastEl.append(header, body);
+            toastContainer.appendChild(toastEl);
+            toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+            new bootstrap.Toast(toastEl).show();
+        }
 
         /**
          * Connect to AIS websocket PDU.
@@ -49,14 +99,7 @@ namespace aisSimulator {
             };
 
             ws.onopen = (ev: Event) => {
-                new Noty({
-                    layout: "centerRight",
-                    progressBar: false,
-                    text: "Connected!",
-                    theme: "bootstrap-v4",
-                    timeout: 500,
-                    type: "success",
-                }).show();
+                showToast("Connected!", "success", 500);
                 submitButton.disabled = false;
                 clearTimeout(reconnectTimeout);
                 reconnectTries = 5;
@@ -65,45 +108,17 @@ namespace aisSimulator {
 
             ws.onerror = (ev: Event) => {
                 console.error("WebSocket error:", ev);
-                new Noty({
-                    layout: "centerRight",
-                    progressBar: false,
-                    text: "Websocket error!",
-                    theme: "bootstrap-v4",
-                    timeout: 3500,
-                    type: "error",
-                }).show();
+                showToast("Websocket error!", "error", 3500);
                 submitButton.disabled = true;
                 if (reconnectTries <= 0) {
                     clearTimeout(reconnectTimeout);
-                    new Noty({
-                        layout: "centerRight",
-                        progressBar: false,
-                        text: "Tried reconnection 5 times. Giving up...",
-                        theme: "bootstrap-v4",
-                        timeout: 5000,
-                        type: "error",
-                    }).show();
-                    new Noty({
-                        layout: "centerRight",
-                        progressBar: false,
-                        text: "Reload page for reconnection.",
-                        theme: "bootstrap-v4",
-                        timeout: false,
-                        type: "error",
-                    }).show();
+                    showToast("Tried reconnection 5 times. Giving up...", "error", 5000);
+                    showToast("Reload page for reconnection.", "error", false);
                 }
             };
 
             ws.onclose = () => {
-                new Noty({
-                    layout: "centerRight",
-                    progressBar: false,
-                    text: `Websocket closed! Reconnecting in ${reconnectTime / 1000} seconds.`,
-                    theme: "bootstrap-v4",
-                    timeout: 5000,
-                    type: "warning",
-                }).show();
+                showToast(`Websocket closed! Reconnecting in ${reconnectTime / 1000} seconds.`, "warning", 5000);
                 submitButton.disabled = true;
                 if (reconnectTries > 0) {
                     reconnectTimeout = setTimeout(websocketConnect, reconnectTime);
@@ -520,23 +535,9 @@ namespace aisSimulator {
 
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(AivdmEncoder.encodeMsg(aisParameters));
-                new Noty({
-                    layout: "centerRight",
-                    progressBar: false,
-                    text: "Message sent.",
-                    theme: "bootstrap-v4",
-                    timeout: 500,
-                    type: "success",
-                }).show();
+                showToast("Message sent.", "success", 500);
             } else {
-                new Noty({
-                    layout: "centerRight",
-                    progressBar: false,
-                    text: "Websocket not ready.",
-                    theme: "bootstrap-v4",
-                    timeout: 3000,
-                    type: "error",
-                }).show();
+                showToast("Websocket not ready.", "error", 3000);
             }
         }
     })();

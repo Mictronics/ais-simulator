@@ -13,7 +13,7 @@
   "files": [
     "./webapp/ais-simulator.ts",
     "./webapp/aivdm_encoder.ts",
-    "./webapp/noty.d.ts",
+    "./webapp/bootstrap.d.ts",
     "./webapp/types.d.ts"
   ],
   "exclude": ["node_modules"]
