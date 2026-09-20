@@ -13,6 +13,73 @@ var aisSimulator;
         eAtoN[eAtoN["Real"] = 1] = "Real";
         eAtoN[eAtoN["Virtual"] = 2] = "Virtual";
     })(eAtoN = aisSimulator.eAtoN || (aisSimulator.eAtoN = {}));
+    const toastContainer = document.getElementById("toastContainer");
+    const toastLabel = {
+        success: "Success",
+        warning: "Warning",
+        error: "Error",
+    };
+    const toastIconClass = {
+        success: "text-success",
+        warning: "text-warning",
+        error: "text-danger",
+    };
+    function showToast(text, type, timeout) {
+        const toastEl = document.createElement("div");
+        toastEl.className = "toast";
+        toastEl.setAttribute("role", "alert");
+        toastEl.setAttribute("aria-live", "assertive");
+        toastEl.setAttribute("aria-atomic", "true");
+        if (timeout === false) {
+            toastEl.dataset.bsAutohide = "false";
+        }
+        else {
+            toastEl.dataset.bsDelay = String(timeout);
+        }
+        const header = document.createElement("div");
+        header.className = "toast-header";
+        header.innerHTML = `<span class="${toastIconClass[type]} me-2">●</span><strong class="me-auto">${toastLabel[type]}</strong>`;
+        const closeButton = document.createElement("button");
+        closeButton.type = "button";
+        closeButton.className = "btn-close";
+        closeButton.setAttribute("data-bs-dismiss", "toast");
+        closeButton.setAttribute("aria-label", "Close");
+        header.appendChild(closeButton);
+        const body = document.createElement("div");
+        body.className = "toast-body";
+        body.textContent = text;
+        toastEl.append(header, body);
+        toastContainer.appendChild(toastEl);
+        toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+        new bootstrap.Toast(toastEl).show();
+    }
+    aisSimulator.showToast = showToast;
+    let ws = null;
+    function sendAisMessage(ap) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(aisSimulator.AivdmEncoder.encodeMsg(ap));
+            return true;
+        }
+        return false;
+    }
+    aisSimulator.sendAisMessage = sendAisMessage;
+    function validateNumericField(el, parser, min, max) {
+        const value = parser(el.value);
+        if (value < min || value > max) {
+            el.classList.replace("is-valid", "is-invalid");
+            return null;
+        }
+        return value;
+    }
+    aisSimulator.validateNumericField = validateNumericField;
+    function validateStringField(el, minLength, maxLength) {
+        if (el.value.length < minLength || el.value.length > maxLength) {
+            el.classList.replace("is-valid", "is-invalid");
+            return null;
+        }
+        return el.value;
+    }
+    aisSimulator.validateStringField = validateStringField;
     (() => {
         let msgType24 = eMessageType24.Unknown;
         let navAidSimType = eAtoN.Real;
@@ -20,48 +87,7 @@ var aisSimulator;
         let reconnectTimeout = null;
         let reconnectTries = 5;
         let reconnectTime = 5000;
-        let ws = null;
         const submitButton = document.getElementById("aisParameterSubmitButton");
-        const toastContainer = document.getElementById("toastContainer");
-        const toastLabel = {
-            success: "Success",
-            warning: "Warning",
-            error: "Error",
-        };
-        const toastIconClass = {
-            success: "text-success",
-            warning: "text-warning",
-            error: "text-danger",
-        };
-        function showToast(text, type, timeout) {
-            const toastEl = document.createElement("div");
-            toastEl.className = "toast";
-            toastEl.setAttribute("role", "alert");
-            toastEl.setAttribute("aria-live", "assertive");
-            toastEl.setAttribute("aria-atomic", "true");
-            if (timeout === false) {
-                toastEl.dataset.bsAutohide = "false";
-            }
-            else {
-                toastEl.dataset.bsDelay = String(timeout);
-            }
-            const header = document.createElement("div");
-            header.className = "toast-header";
-            header.innerHTML = `<span class="${toastIconClass[type]} me-2">●</span><strong class="me-auto">${toastLabel[type]}</strong>`;
-            const closeButton = document.createElement("button");
-            closeButton.type = "button";
-            closeButton.className = "btn-close";
-            closeButton.setAttribute("data-bs-dismiss", "toast");
-            closeButton.setAttribute("aria-label", "Close");
-            header.appendChild(closeButton);
-            const body = document.createElement("div");
-            body.className = "toast-body";
-            body.textContent = text;
-            toastEl.append(header, body);
-            toastContainer.appendChild(toastEl);
-            toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
-            new bootstrap.Toast(toastEl).show();
-        }
         function websocketConnect() {
             ws = new WebSocket("ws://localhost:52002/ws");
             ws.onmessage = (evt) => {
@@ -203,21 +229,6 @@ var aisSimulator;
         document.getElementById("aisEtaInput").value = (new Date(Date.now())).toISOString().slice(0, 16);
         function verifyMmsi(mmsi) {
             return /^[0-9]{9}$/.test(mmsi);
-        }
-        function validateNumericField(el, parser, min, max) {
-            const value = parser(el.value);
-            if (value < min || value > max) {
-                el.classList.replace("is-valid", "is-invalid");
-                return null;
-            }
-            return value;
-        }
-        function validateStringField(el, minLength, maxLength) {
-            if (el.value.length < minLength || el.value.length > maxLength) {
-                el.classList.replace("is-valid", "is-invalid");
-                return null;
-            }
-            return el.value;
         }
         function validateForm(form) {
             const aisParameters = {
@@ -454,8 +465,7 @@ var aisSimulator;
                 return;
             }
             aisParameters.interrogationMsgType = num;
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(aisSimulator.AivdmEncoder.encodeMsg(aisParameters));
+            if (sendAisMessage(aisParameters)) {
                 showToast("Message sent.", "success", 500);
             }
             else {

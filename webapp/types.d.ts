@@ -100,39 +100,40 @@ declare namespace aisSimulator {
     }
 
     export interface INavPoint {
-        active: boolean;
-        altitude?: number;
         lat: number;
         lon: number;
-        name: string;
     }
 
     export interface IRoute {
-        ActiveNavPointId: number;
-        distanceToNavPoint: number; // meters
-        name: string;
         navPoints: INavPoint[];
-        repeat: boolean;
-        timeToNavPoint: number; // seconds
+        repeat: boolean; // loop back to first point when the last is reached, instead of stopping
+        currentLegIndex: number;
     }
 
     export interface IVessel {
         mmsi: number;
-        altitude: number; // meters
-        beam: number; // meters
-        callsign: string;
-        course: number;
-        destLat: number; // decimal degree DD.MMMMMMM
-        destLon: number; // decimal degree DD.MMMMMMM
-        length: number; // meters
         name: string;
-        posLat: number; // decimal degree DD.MMMMMMM
-        posLon: number; // decimal degree DD.MMMMMMM
-        routeActive: boolean;
-        route: IRoute;
+        callsign: string;
+        aisClass: eAisClass;
+        type: number; // AIS vessel type code
+        length: number; // meters
+        beam: number; // meters
+        draught: number; // 1/10 meters, Class A static data only
+        destination: string; // Class A static data only
+        status: number; // navigation status, Type 1 position reports only
+        posLat: number;
+        posLon: number;
         speed: number; // knots
-        status: number;
-        type: number;
-        updateNavigation(): void;
+        course: number; // degrees, also used as heading since movement always faces travel direction
+        movementMode: eMovementMode;
+        circleCenterLat: number;
+        circleCenterLon: number;
+        circleRadiusKm: number;
+        circleAngleDeg: number; // current phase, mutated each tick
+        route: IRoute;
+        positionIntervalSec: number;
+        staticIntervalSec: number;
+        nextPositionSendAt: number; // ms epoch
+        nextStaticSendAt: number; // ms epoch
     }
 }

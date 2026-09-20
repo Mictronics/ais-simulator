@@ -11,4 +11,11 @@ declare namespace bootstrap {
 		hide: () => void;
 		dispose: () => void;
 	}
+
+	class Modal {
+		constructor(element: Element);
+		show: () => void;
+		hide: () => void;
+		dispose: () => void;
+	}
 }

@@ -12,8 +12,9 @@
   "engines": {
     "tsc": ">= 3.9.0"
   },
-  "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
   "scripts": {
     "build": "tsc --build"
   }

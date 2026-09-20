@@ -5,4 +5,5 @@ ais-simulator.code-workspace
 top_block.py
 **/__pycache__/
 .claude.local.md
-webapp/assets/tsconfig.tsbuildinfo
+webapp/tsconfig.tsbuildinfo
+node_modules

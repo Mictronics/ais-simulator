@@ -7,13 +7,16 @@
     "sourceMap": true,
     "module": "ES6",
     "alwaysStrict": true,
-    "outDir": "./webapp/assets/"
+    "outDir": "./webapp/assets/",
+    "rootDir": "./webapp"
   },
   "compileOnSave": true,
   "files": [
     "./webapp/ais-simulator.ts",
     "./webapp/aivdm_encoder.ts",
+    "./webapp/traffic_simulator.ts",
     "./webapp/bootstrap.d.ts",
+    "./webapp/leaflet.d.ts",
     "./webapp/types.d.ts"
   ],
   "exclude": ["node_modules"]

@@ -29,6 +29,108 @@ namespace aisSimulator {
         Virtual = 2,
     }
 
+    const toastContainer = document.getElementById("toastContainer") as HTMLDivElement;
+
+    type ToastType = "success" | "warning" | "error";
+
+    const toastLabel: Record<ToastType, string> = {
+        success: "Success",
+        warning: "Warning",
+        error: "Error",
+    };
+
+    const toastIconClass: Record<ToastType, string> = {
+        success: "text-success",
+        warning: "text-warning",
+        error: "text-danger",
+    };
+
+    /**
+     * Show a Bootstrap toast notification, top-right, stacked.
+     */
+    export function showToast(text: string, type: ToastType, timeout: number | false): void {
+        const toastEl = document.createElement("div");
+        toastEl.className = "toast";
+        toastEl.setAttribute("role", "alert");
+        toastEl.setAttribute("aria-live", "assertive");
+        toastEl.setAttribute("aria-atomic", "true");
+        if (timeout === false) {
+            toastEl.dataset.bsAutohide = "false";
+        } else {
+            toastEl.dataset.bsDelay = String(timeout);
+        }
+
+        const header = document.createElement("div");
+        header.className = "toast-header";
+        header.innerHTML = `<span class="${toastIconClass[type]} me-2">●</span><strong class="me-auto">${toastLabel[type]}</strong>`;
+        const closeButton = document.createElement("button");
+        closeButton.type = "button";
+        closeButton.className = "btn-close";
+        closeButton.setAttribute("data-bs-dismiss", "toast");
+        closeButton.setAttribute("aria-label", "Close");
+        header.appendChild(closeButton);
+
+        const body = document.createElement("div");
+        body.className = "toast-body";
+        body.textContent = text;
+
+        toastEl.append(header, body);
+        toastContainer.appendChild(toastEl);
+        toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+        new bootstrap.Toast(toastEl).show();
+    }
+
+    let ws: WebSocket = null;
+
+    /**
+     * Send an AIS parameter set as an encoded AIVDM message over the shared websocket.
+     * @returns true if the message was sent, false if the socket isn't open.
+     */
+    export function sendAisMessage(ap: IAisParameter): boolean {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(AivdmEncoder.encodeMsg(ap));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Parse a numeric form field, validate its range, and mark it invalid on failure.
+     * @param el Form element to validate.
+     * @param parser Number parser, e.g. parseFloat or (v) => parseInt(v, 10).
+     * @param min Minimum allowed value (inclusive).
+     * @param max Maximum allowed value (inclusive).
+     * @returns The parsed value, or null if out of range.
+     */
+    export function validateNumericField(
+        el: HTMLInputElement | HTMLSelectElement,
+        parser: (value: string) => number,
+        min: number,
+        max: number,
+    ): number | null {
+        const value = parser(el.value);
+        if (value < min || value > max) {
+            el.classList.replace("is-valid", "is-invalid");
+            return null;
+        }
+        return value;
+    }
+
+    /**
+     * Validate a string form field's length and mark it invalid on failure.
+     * @param el Form element to validate.
+     * @param minLength Minimum allowed length (inclusive).
+     * @param maxLength Maximum allowed length (inclusive).
+     * @returns The field value, or null if out of range.
+     */
+    export function validateStringField(el: HTMLInputElement, minLength: number, maxLength: number): string | null {
+        if (el.value.length < minLength || el.value.length > maxLength) {
+            el.classList.replace("is-valid", "is-invalid");
+            return null;
+        }
+        return el.value;
+    }
+
     (() => {
         let msgType24: eMessageType24 = eMessageType24.Unknown;
         let navAidSimType: eAtoN = eAtoN.Real;
@@ -36,58 +138,7 @@ namespace aisSimulator {
         let reconnectTimeout: number = null;
         let reconnectTries: number = 5;
         let reconnectTime: number = 5000;
-        let ws: WebSocket = null;
         const submitButton = document.getElementById("aisParameterSubmitButton") as HTMLButtonElement;
-        const toastContainer = document.getElementById("toastContainer") as HTMLDivElement;
-
-        type ToastType = "success" | "warning" | "error";
-
-        const toastLabel: Record<ToastType, string> = {
-            success: "Success",
-            warning: "Warning",
-            error: "Error",
-        };
-
-        const toastIconClass: Record<ToastType, string> = {
-            success: "text-success",
-            warning: "text-warning",
-            error: "text-danger",
-        };
-
-        /**
-         * Show a Bootstrap toast notification, top-right, stacked.
-         */
-        function showToast(text: string, type: ToastType, timeout: number | false): void {
-            const toastEl = document.createElement("div");
-            toastEl.className = "toast";
-            toastEl.setAttribute("role", "alert");
-            toastEl.setAttribute("aria-live", "assertive");
-            toastEl.setAttribute("aria-atomic", "true");
-            if (timeout === false) {
-                toastEl.dataset.bsAutohide = "false";
-            } else {
-                toastEl.dataset.bsDelay = String(timeout);
-            }
-
-            const header = document.createElement("div");
-            header.className = "toast-header";
-            header.innerHTML = `<span class="${toastIconClass[type]} me-2">●</span><strong class="me-auto">${toastLabel[type]}</strong>`;
-            const closeButton = document.createElement("button");
-            closeButton.type = "button";
-            closeButton.className = "btn-close";
-            closeButton.setAttribute("data-bs-dismiss", "toast");
-            closeButton.setAttribute("aria-label", "Close");
-            header.appendChild(closeButton);
-
-            const body = document.createElement("div");
-            body.className = "toast-body";
-            body.textContent = text;
-
-            toastEl.append(header, body);
-            toastContainer.appendChild(toastEl);
-            toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
-            new bootstrap.Toast(toastEl).show();
-        }
 
         /**
          * Connect to AIS websocket PDU.
@@ -279,43 +330,6 @@ namespace aisSimulator {
          */
         function verifyMmsi(mmsi: string): boolean {
             return /^[0-9]{9}$/.test(mmsi);
-        }
-
-        /**
-         * Parse a numeric form field, validate its range, and mark it invalid on failure.
-         * @param el Form element to validate.
-         * @param parser Number parser, e.g. parseFloat or (v) => parseInt(v, 10).
-         * @param min Minimum allowed value (inclusive).
-         * @param max Maximum allowed value (inclusive).
-         * @returns The parsed value, or null if out of range.
-         */
-        function validateNumericField(
-            el: HTMLInputElement | HTMLSelectElement,
-            parser: (value: string) => number,
-            min: number,
-            max: number,
-        ): number | null {
-            const value = parser(el.value);
-            if (value < min || value > max) {
-                el.classList.replace("is-valid", "is-invalid");
-                return null;
-            }
-            return value;
-        }
-
-        /**
-         * Validate a string form field's length and mark it invalid on failure.
-         * @param el Form element to validate.
-         * @param minLength Minimum allowed length (inclusive).
-         * @param maxLength Maximum allowed length (inclusive).
-         * @returns The field value, or null if out of range.
-         */
-        function validateStringField(el: HTMLInputElement, minLength: number, maxLength: number): string | null {
-            if (el.value.length < minLength || el.value.length > maxLength) {
-                el.classList.replace("is-valid", "is-invalid");
-                return null;
-            }
-            return el.value;
         }
 
         /**
@@ -533,8 +547,7 @@ namespace aisSimulator {
             if (num === null) { return; }
             aisParameters.interrogationMsgType = num;
 
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(AivdmEncoder.encodeMsg(aisParameters));
+            if (sendAisMessage(aisParameters)) {
                 showToast("Message sent.", "success", 500);
             } else {
                 showToast("Websocket not ready.", "error", 3000);

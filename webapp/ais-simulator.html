@@ -11,17 +11,54 @@
     />
     <link rel="stylesheet" href="./assets/bootstrap.min.css" />
     <link rel="stylesheet" href="./assets/styles.css" />
-    <link rel="stylesheet" href="./assets/noty.css" />
-    <link rel="stylesheet" href="./assets/bootstrap-v4.css" />
+    <link rel="stylesheet" href="./assets/leaflet.css" />
   </head>
   <body>
     <div
       id="toastContainer"
       class="toast-container position-fixed top-0 end-0 p-3"
-      style="z-index: 11"
+      style="z-index: 1100"
     ></div>
     <div class="container-sm">
       <h1>AIS Message Simulator</h1>
+      <ul class="nav nav-tabs mb-3" id="mainTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="singleMessage-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#singleMessage-pane"
+            type="button"
+            role="tab"
+            aria-controls="singleMessage-pane"
+            aria-selected="true"
+          >
+            Single Message
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="trafficSimulator-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#trafficSimulator-pane"
+            type="button"
+            role="tab"
+            aria-controls="trafficSimulator-pane"
+            aria-selected="false"
+          >
+            Traffic Simulator
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content" id="mainTabContent">
+      <div
+        class="tab-pane fade show active"
+        id="singleMessage-pane"
+        role="tabpanel"
+        aria-labelledby="singleMessage-tab"
+        tabindex="0"
+      >
       <form id="aisParameterForm" class="aisParameterForm" novalidate>
         <div class="form-group">
           <label for="aisMmsiInput"
@@ -794,6 +831,455 @@
           Reset
         </button>
       </form>
+      </div>
+      <div
+        class="tab-pane fade"
+        id="trafficSimulator-pane"
+        role="tabpanel"
+        aria-labelledby="trafficSimulator-tab"
+        tabindex="0"
+      >
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="simVesselCountInput">Number of Vessels</label>
+              <input
+                type="number"
+                id="simVesselCountInput"
+                class="form-control form-control-sm"
+                min="1"
+                max="200"
+                step="1"
+                value="10"
+              />
+            </div>
+            <div class="form-group">
+              <label for="simCenterLatInput">Center Latitude</label>
+              <input
+                type="number"
+                id="simCenterLatInput"
+                class="form-control form-control-sm"
+                min="-90"
+                max="90"
+                step="0.00000001"
+                value="48.0"
+              />
+            </div>
+            <div class="form-group">
+              <label for="simCenterLonInput">Center Longitude</label>
+              <input
+                type="number"
+                id="simCenterLonInput"
+                class="form-control form-control-sm"
+                min="-180"
+                max="180"
+                step="0.00000001"
+                value="10.0"
+              />
+            </div>
+            <div class="form-group">
+              <button
+                type="button"
+                id="simPickCenterButton"
+                class="btn btn-sm btn-outline-secondary mt-1"
+              >
+                Pick Center On Map
+              </button>
+              <small class="form-text text-muted"
+                >Click the button, then click the map to set the center
+                coordinate.
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="simScatterRadiusInput">Scatter Radius (km)</label>
+              <input
+                type="number"
+                id="simScatterRadiusInput"
+                class="form-control form-control-sm"
+                min="0.1"
+                max="500"
+                step="0.1"
+                value="10"
+              />
+            </div>
+            <div class="form-group">
+              <label for="simDefaultClassSelect">Default AIS Class</label>
+              <select
+                id="simDefaultClassSelect"
+                class="form-control form-control-sm"
+              >
+                <option value="1" selected>Class A</option>
+                <option value="2">Class B</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="simSpeedMinInput">Speed Range (knots)</label>
+              <div class="d-flex gap-1">
+                <input
+                  type="number"
+                  id="simSpeedMinInput"
+                  class="form-control form-control-sm"
+                  min="0"
+                  max="50"
+                  step="0.1"
+                  value="5"
+                />
+                <input
+                  type="number"
+                  id="simSpeedMaxInput"
+                  class="form-control form-control-sm"
+                  min="0"
+                  max="50"
+                  step="0.1"
+                  value="15"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="simPositionIntervalInput"
+                >Position Report Interval (s)</label
+              >
+              <input
+                type="number"
+                id="simPositionIntervalInput"
+                class="form-control form-control-sm"
+                min="2"
+                max="180"
+                step="1"
+                value="10"
+              />
+            </div>
+            <div class="form-group">
+              <label for="simStaticIntervalInput"
+                >Static/Voyage Report Interval (s)</label
+              >
+              <input
+                type="number"
+                id="simStaticIntervalInput"
+                class="form-control form-control-sm"
+                min="10"
+                max="1800"
+                step="1"
+                value="360"
+              />
+            </div>
+            <button
+              type="button"
+              id="simStartButton"
+              class="btn btn-sm btn-success mt-2"
+            >
+              Start
+            </button>
+            <button
+              type="button"
+              id="simStopButton"
+              class="btn btn-sm btn-danger mt-2"
+              disabled
+            >
+              Stop
+            </button>
+            <h5 class="mt-3">Vessels</h5>
+            <div style="max-height: 300px; overflow-y: auto">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>MMSI</th>
+                    <th>Name</th>
+                    <th>Speed</th>
+                    <th>Mode</th>
+                  </tr>
+                </thead>
+                <tbody id="simVesselListBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div id="simMap" style="height: 600px"></div>
+            <small class="form-text text-muted"
+              >Click a vessel marker to edit it. While drawing a route, click
+              the map to add waypoints.
+            </small>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="vesselConfigModal"
+        tabindex="-1"
+        aria-labelledby="vesselConfigModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="vesselConfigModalLabel">
+                Vessel Configuration
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="vesselConfigForm" novalidate>
+                <div class="form-group">
+                  <label for="vesselMmsiInput">MMSI</label>
+                  <input
+                    type="text"
+                    id="vesselMmsiInput"
+                    class="form-control form-control-sm"
+                    minlength="9"
+                    maxlength="9"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselNameInput">Name</label>
+                  <input
+                    type="text"
+                    id="vesselNameInput"
+                    class="form-control form-control-sm"
+                    minlength="1"
+                    maxlength="20"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselCallsignInput">Callsign</label>
+                  <input
+                    type="text"
+                    id="vesselCallsignInput"
+                    class="form-control form-control-sm"
+                    minlength="1"
+                    maxlength="7"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselClassSelect">AIS Class</label>
+                  <select
+                    id="vesselClassSelect"
+                    class="form-control form-control-sm"
+                  >
+                    <option value="1">Class A</option>
+                    <option value="2">Class B</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="vesselTypeSelect">Vessel Type</label>
+                  <select
+                    id="vesselTypeSelect"
+                    class="form-control form-control-sm"
+                  ></select>
+                </div>
+                <div class="form-group">
+                  <label for="vesselLengthInput">Length (m)</label>
+                  <input
+                    type="number"
+                    id="vesselLengthInput"
+                    class="form-control form-control-sm"
+                    min="0"
+                    max="1022"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselBeamInput">Beam (m)</label>
+                  <input
+                    type="number"
+                    id="vesselBeamInput"
+                    class="form-control form-control-sm"
+                    min="1"
+                    max="126"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselDraughtInput">Draught (m)</label>
+                  <input
+                    type="number"
+                    id="vesselDraughtInput"
+                    class="form-control form-control-sm"
+                    min="0"
+                    max="25.5"
+                    step="0.1"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselDestinationInput">Destination</label>
+                  <input
+                    type="text"
+                    id="vesselDestinationInput"
+                    class="form-control form-control-sm"
+                    minlength="1"
+                    maxlength="20"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselStatusSelect">Navigation Status</label>
+                  <select
+                    id="vesselStatusSelect"
+                    class="form-control form-control-sm"
+                  >
+                    <option value="0">Under way using engine</option>
+                    <option value="1">At anchor</option>
+                    <option value="2">Not under command</option>
+                    <option value="3">Restricted manoeuverability</option>
+                    <option value="4">Constrained by her draught</option>
+                    <option value="5">Moored</option>
+                    <option value="6">Aground</option>
+                    <option value="7">Engaged in Fishing</option>
+                    <option value="8">Under way sailing</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="vesselSpeedInput">Speed (knots)</label>
+                  <input
+                    type="number"
+                    id="vesselSpeedInput"
+                    class="form-control form-control-sm"
+                    min="0"
+                    max="102.2"
+                    step="0.1"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselCourseInput">Course (degrees)</label>
+                  <input
+                    type="number"
+                    id="vesselCourseInput"
+                    class="form-control form-control-sm"
+                    min="0"
+                    max="359.9"
+                    step="0.1"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselMovementModeSelect">Movement Mode</label>
+                  <select
+                    id="vesselMovementModeSelect"
+                    class="form-control form-control-sm"
+                  >
+                    <option value="0">Free (dead reckoning)</option>
+                    <option value="1">Circle</option>
+                    <option value="2">Route</option>
+                  </select>
+                </div>
+                <div class="form-group" id="vesselCircleGroup">
+                  <label for="vesselCircleRadiusInput"
+                    >Circle Radius (km)</label
+                  >
+                  <input
+                    type="number"
+                    id="vesselCircleRadiusInput"
+                    class="form-control form-control-sm"
+                    min="0.05"
+                    max="200"
+                    step="0.05"
+                  />
+                  <small class="form-text text-muted"
+                    >Circle is centered on the vessel's position when this
+                    mode is applied.
+                  </small>
+                </div>
+                <div class="form-group" id="vesselRouteGroup">
+                  <div class="custom-control custom-checkbox">
+                    <input
+                      type="checkbox"
+                      id="vesselRouteRepeatCheckbox"
+                      class="custom-control-input"
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="vesselRouteRepeatCheckbox"
+                      >Loop route</label
+                    >
+                  </div>
+                  <button
+                    type="button"
+                    id="vesselDrawRouteButton"
+                    class="btn btn-sm btn-outline-secondary mt-1"
+                  >
+                    Draw Route On Map
+                  </button>
+                  <button
+                    type="button"
+                    id="vesselClearRouteButton"
+                    class="btn btn-sm btn-outline-danger mt-1"
+                  >
+                    Clear Route
+                  </button>
+                  <small class="form-text text-muted"
+                    >Click "Draw Route", then click the map to add waypoints.
+                  </small>
+                </div>
+                <div class="form-group">
+                  <label for="vesselPositionIntervalInput"
+                    >Position Report Interval (s)</label
+                  >
+                  <input
+                    type="number"
+                    id="vesselPositionIntervalInput"
+                    class="form-control form-control-sm"
+                    min="2"
+                    max="180"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="vesselStaticIntervalInput"
+                    >Static/Voyage Report Interval (s)</label
+                  >
+                  <input
+                    type="number"
+                    id="vesselStaticIntervalInput"
+                    class="form-control form-control-sm"
+                    min="10"
+                    max="1800"
+                    step="1"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                id="vesselRemoveButton"
+                class="btn btn-sm btn-outline-danger me-auto"
+              >
+                Remove Vessel
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                id="vesselConfigSaveButton"
+                class="btn btn-sm btn-success"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <footer
         style="font-weight: lighter !important; font-size: x-small"
         class="mt-5"
@@ -810,7 +1296,9 @@
       type="text/javascript"
       src="./assets/bootstrap.bundle.min.js"
     ></script>
+    <script type="text/javascript" src="./assets/leaflet.js"></script>
     <script type="text/javascript" src="./assets/aivdm_encoder.js"></script>
     <script type="text/javascript" src="./assets/ais-simulator.js"></script>
+    <script type="text/javascript" src="./assets/traffic_simulator.js"></script>
   </body>
 </html>
