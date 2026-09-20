@@ -10,7 +10,9 @@ BlackToolkit. Three parts, each with its own toolchain:
 
 1. **`webapp/`** — TypeScript browser UI. User selects an AIS message type and fills in
    parameters; the page encodes the parameters into an AIVDM bit string and sends it over a
-   WebSocket.
+   WebSocket. Also includes a traffic simulator tab (`traffic_simulator.ts`) that generates and
+   animates multiple vessels on a Leaflet map (vendored `webapp/assets/leaflet.js`/`.css`),
+   sending their reports on independent per-vessel timers.
 2. **`ais-simulator.py`** (repo root) — GNURadio flowgraph ("top_block") run as a standalone
    Python script. Hosts the WebSocket server, converts the incoming bit string PDU into an RF
    frame, GMSK-modulates it, and transmits via an `osmosdr` sink (e.g. HackRF).
@@ -28,6 +30,10 @@ Data flow: browser UI → `AivdmEncoder` (bit string) → WebSocket → `websock
 ```
 npm run build          # tsc --build; compiles webapp/*.ts -> webapp/assets/*.js
 ```
+
+Run `npm install` first. TypeScript is a pinned `devDependency` (5.9.3) — npm's `latest` tag has
+moved to TypeScript 7, which enables stricter type-checking by default and will not build this
+project's non-strict code.
 
 Source files are listed explicitly in `tsconfig.json` (`webapp/ais-simulator.ts`,
 `webapp/aivdm_encoder.ts`, plus `.d.ts` declaration files). Compiled output (with source maps)
@@ -49,12 +55,19 @@ distro-specific `apt-get` dependency lists (differs between generic instructions
 cd gr-ais_simulator
 mkdir build && cd build
 cmake ../ -Wno-dev \
-  -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3.10 \
-  -DPYTHON_INCLUDE_DIR:PATH=/usr/include/python3.10 \
-  -DPYTHON_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpython3.10.so
+  -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3.X \
+  -DPYTHON_INCLUDE_DIR:PATH=/usr/include/python3.X \
+  -DPYTHON_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpython3.X.so
 make
 sudo make install
 ```
+
+If `build/` was previously configured for a different Python version, `rm -rf build` first —
+CMake caches the detected Python module extension in `CMakeCache.txt` and won't recompute it on a
+later `cmake` re-run just because `PYTHON_EXECUTABLE` changed. A stale cache builds a `.so` tagged
+for the wrong Python ABI that installs invisibly (silently swallowed `ModuleNotFoundError` in
+`python/ais_simulator/__init__.py`), surfacing later as a misleading `AttributeError: module
+'gnuradio.ais_simulator' has no attribute 'websocket_pdu'` instead of an import error.
 
 Must be rebuilt and reinstalled after any GNURadio toolchain upgrade. If Python fails to find the
 module (`ImportError: No module named ais_simulator`), fix `PYTHONPATH`/`LD_LIBRARY_PATH` and run
@@ -87,6 +100,9 @@ a message. Key `ais-simulator.py` CLI flags: `--channel {A,B}` (161.975/162.025 
 
 Touches three places that must stay in sync:
 1. `webapp/types.d.ts` — extend `IAisParameter` with any new fields.
+   Note: `types.d.ts` is an ambient `declare namespace` — a plain `enum` declared in it is
+   type-only and emits no runtime object. Enums that need runtime values (like `eMovementMode` in
+   `traffic_simulator.ts`) must be declared in a real, emitting `.ts` file instead.
 2. `webapp/aivdm_encoder.ts` — add an `encodeMsgTypeNN` method and a `case` in
    `AivdmEncoder.encodeMsg`'s switch; also extend `encoderTest()`'s sample parameters used to
    sanity-check bitstream length against the ITU-R M.1371 spec (cf.
@@ -109,3 +125,6 @@ they operate on raw bit strings/frames and don't need changes for new AIS messag
 - For `/code-review`, prefer per-directory targets (`webapp/`, `gr-ais_simulator/lib`,
   `ais-simulator.py`) at `medium` effort over `high .` on the whole repo, which has stalled
   (spawns multiple finder agents; one can hang 600s+).
+- Leaflet's own panes/controls use z-index up to `1000` (`webapp/assets/leaflet.css`). Any new
+  fixed-position UI drawn over the map (toasts, overlays) needs a higher z-index or it renders
+  hidden underneath the map.
