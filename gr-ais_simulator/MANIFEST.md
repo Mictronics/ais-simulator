@@ -10,7 +10,7 @@ tags:
   copyright_owner:
 - Copyright 2020-2024, Michael Wolf
   license: GPL v3
-  gr_supported_version: 3.10.1.1
+  gr_supported_version: 3.10.1.1 - 3.10.9.2
   repo: https://github.com/Mictronics/ais-simulator
 
 ---

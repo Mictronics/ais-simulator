@@ -7,14 +7,12 @@ a websocket server to PDU message converter.
 
 The web application let you select and compose various AIS message and performs conversion to the required bit string that is then send via websocket connection to the GNURadio backend.
 
-Tested in the following environment:
+Tested in the following environments:
 
-- GnuRadio 3.10.1.1
-- gr-osmosdr 0.2.0
-- Ubuntu 22.04 jammy
-- Python 3.10.12
-- GNU C++ version 11.4; Boost 1.74.
-- HackRF One (2018.01.1)
+- GnuRadio 3.10.1.1, gr-osmosdr 0.2.0, Ubuntu 22.04 jammy, Python 3.10.12,
+  GNU C++ 11.4, Boost 1.74, HackRF One (2018.01.1)
+- GnuRadio 3.10.9.2, gr-osmosdr 0.2.5, Ubuntu 24.04 noble, Python 3.12.3,
+  GNU C++ 13.3, Boost 1.83, HackRF One (2023.01.1)
 
 ## Building
 
@@ -42,8 +40,9 @@ sudo apt-get install -y \
     libosmocore-dev
 ```
 
-Debian 11 bullseye / Ubuntu 22.04 jammy (Python 3 based toolchain, matches the
-tested environment above):
+Debian 11 bullseye / Ubuntu 22.04 jammy / Ubuntu 24.04 noble (Python 3 based
+toolchain, matches the tested environments above; same package names hold
+across all three):
 
 ```
 sudo apt-get install -y \
@@ -71,12 +70,17 @@ Note: gr-ais_simulator blocks need to rebuild and installed after GnuRadio toolc
 ### Web application
 
 The web UI is written in TypeScript and compiled to `webapp/assets/`, which is checked into the
-repository. If you edit any file under `webapp/*.ts`, rebuild the compiled output before testing
-in a browser:
+repository. TypeScript is a pinned `devDependency` (5.9.3 as of this writing — npm's `latest` tag
+has moved to TypeScript 7, which enables stricter type-checking by default and will not build this
+project's non-strict code). Install it once, then rebuild the compiled output after editing any
+file under `webapp/*.ts`:
 
 ```
+npm install
 npm run build
 ```
+
+Tested with Node.js 24.14.1 / npm 11.11.0.
 
 ## How to run
 
