@@ -113,6 +113,15 @@ Touches three places that must stay in sync:
 The GNURadio blocks themselves (`bitstring_to_frame`, `websocket_pdu`) are message-type-agnostic —
 they operate on raw bit strings/frames and don't need changes for new AIS message types.
 
+`bitstring_to_frame` implements only the HDLC framing half of ITU-R M.1371's link layer (preamble,
+start/stop flags, bit stuffing, CRC-16/X.25, NRZI) — not the SOTDMA/ITDMA/RATDMA/FATDMA channel
+access scheme (slot timing to avoid colliding with other stations on a shared channel; the
+"communication state" field is a hardcoded dummy value in `aivdm_encoder.ts`'s `encodeMsgType1`/
+`encodeMsgType4`). Deliberate: channel access is a transmitter-side etiquette protocol between
+multiple live stations, irrelevant to whether a single received frame decodes — which is why this
+transmits fine against real receivers (tested against Saab R4/R5) despite not implementing it. Only
+add it if this tool needs to coexist with other live transmitters on a shared channel.
+
 ## Verifying changes
 
 - Bit-manipulation logic in `gr-ais_simulator/lib/*.cc` (byte swaps, CRC reversal, NRZI) is easy to
