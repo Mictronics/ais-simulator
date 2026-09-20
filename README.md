@@ -9,8 +9,6 @@ The web application let you select and compose various AIS message and performs 
 
 Tested in the following environments:
 
-- GnuRadio 3.10.1.1, gr-osmosdr 0.2.0, Ubuntu 22.04 jammy, Python 3.10.12,
-  GNU C++ 11.4, Boost 1.74, HackRF One (2018.01.1)
 - GnuRadio 3.10.9.2, gr-osmosdr 0.2.5, Ubuntu 24.04 noble, Python 3.12.3,
   GNU C++ 13.3, Boost 1.83, HackRF One (2023.01.1)
 
@@ -108,7 +106,7 @@ Run `python3 ais-simulator.py --help` for the full list. The most commonly used 
 
 #### License
 
-Copyright 2020-2024, Mictronics
+Copyright 2020-2026, Mictronics
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
